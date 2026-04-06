@@ -76,5 +76,14 @@
     "caption": "Shea Surname in Chinese Characters",
     "location": "China", 
     "people": ["ancestor-china"]
- }
+  },
+{
+    "id": "p0012",
+    "url": "/photos/Shea Weng Cheong CNY 2026.jpg",
+    "caption": "Shea Weng Cheong and family celebrating Chinese New Year 2026",
+    "location": "Shah Alam, Malaysia",
+    "year": 2026, 
+    "people": ["shea-weng-cheong","shea-yuet-ming","shea-yuet-seong","lee-bee-loo","shea-wai-leong","elaine-chen","shea-wan-hoe"]
+  }
+  
 ]

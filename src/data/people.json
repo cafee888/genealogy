@@ -364,6 +364,7 @@
   {
     "id": "lee-bee-loo",
     "name": "Lee Bee Loo",
+    "aliasName": "Lee Bee Hong",
     "chineseName": "李美如",
     "birth": {
       "place": "Malaysia",
@@ -392,6 +393,7 @@
   {
     "id": "shea-wai-leong",
     "name": "Shea Wai Leong",
+    "aliasName": "Peter Shea",
     "chineseName": "佘偉量",
     "birth": {
       "place": "Malaysia",
@@ -468,6 +470,7 @@
   {
     "id": "shea-wan-hoe",
     "name": "Shea Wan Hoe",
+    "aliasName":"Jasper Shea",
     "chineseName": "佘運豪",
     "birth": {
       "place": "Malaysia",
@@ -487,7 +490,7 @@
       }
     ],
     "parents": [
-      "shea-wai-leong"
+      "shea-wai-leong","elaine-chen"
     ],
     "bio": "Wan Hoe is the only child of Wai Leong. He was born in Shah Alam, Selangor, Malaysia, and currently studying in Melaka, Malaysia.",
     "gender": "male",
@@ -698,6 +701,7 @@
   {
     "id": "shea-chee-wang",
     "name": "Bernard Shea Chee Wang",
+    "aliasName": "Chee Wang",
     "chineseName": "佘志宏",
     "birth": {
       "place": "Malaysia"
@@ -813,7 +817,8 @@
   },
   {
     "id": "shea-kong-choy",
-    "name": "Shea Kong Choy (Shea Thean Choy)",
+    "name": "Shea Kong Choy",
+    "aliasName": "Shea Thean Choy",
     "chineseName": "佘光忠",
     "birth": {
       "place": "Malaya"

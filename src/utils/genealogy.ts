@@ -8,6 +8,7 @@ function normalizePerson(raw: Partial<Person> & { id: string; name: string }): P
   return {
     id: raw.id,
     name: raw.name,
+    aliasName: raw.aliasName ?? null,
     chineseName: raw.chineseName ?? null,
     gender: raw.gender === "female" ? "female" : "male",
     deceased: raw.deceased ?? inferredDeceased,

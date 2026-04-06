@@ -133,6 +133,11 @@ function PersonPage() {
             <strong>Chinese Name:</strong> {person.chineseName}
           </p>
         )}
+        {person.aliasName && (
+          <p>
+            <strong>Alias Name:</strong> {person.aliasName}
+          </p>
+        )}
         <p>
           <strong>Gender:</strong> {person.gender === "female" ? "Female" : "Male"}
         </p>

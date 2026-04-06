@@ -249,28 +249,28 @@ body::before {
   position: absolute;
   right: 7px;
   bottom: 5px;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
   border: 2px solid #0f5f96;
-  background: radial-gradient(circle at 32% 28%, #66d4ff, #0a6fa8 68%, #075882 100%);
+  background: linear-gradient(155deg, #5fd3ff, #0a6fa8 72%, #08597f 100%);
   color: #ffffff;
-  font-size: 1.2rem;
+  font-size: 1.28rem;
   font-weight: 900;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 2px rgba(168, 230, 255, 0.4), 0 5px 14px rgba(8, 32, 49, 0.34);
+  box-shadow: 0 0 0 2px rgba(168, 230, 255, 0.32), 0 5px 14px rgba(8, 32, 49, 0.34);
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
 }
 
 .tree-person-node__toggle:hover {
-  transform: scale(1.1);
+  transform: scale(1.07);
   border-color: #94e0ff;
-  box-shadow: 0 0 0 4px rgba(105, 210, 255, 0.35), 0 6px 16px rgba(6, 25, 39, 0.38);
-  background: radial-gradient(circle at 32% 28%, #8ce4ff, #1381bc 70%, #09638f 100%);
+  box-shadow: 0 0 0 4px rgba(105, 210, 255, 0.28), 0 6px 16px rgba(6, 25, 39, 0.38);
+  background: linear-gradient(155deg, #86e3ff, #1381bc 72%, #09638f 100%);
 }
 
 .tree-canvas .react-flow__controls {

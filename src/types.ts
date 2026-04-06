@@ -9,6 +9,7 @@ export interface LocationEvent {
 export interface Person {
   id: string;
   name: string;
+  aliasName?: string | null;
   chineseName: string | null;
   gender: "male" | "female";
   deceased: boolean;

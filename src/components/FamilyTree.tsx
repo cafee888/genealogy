@@ -312,8 +312,9 @@ function FamilyTree() {
 
     return people.filter((person) => {
       const name = person.name.toLowerCase();
+      const aliasName = (person.aliasName ?? "").toLowerCase();
       const chineseName = (person.chineseName ?? "").toLowerCase();
-      return name.includes(query) || chineseName.includes(query);
+      return name.includes(query) || aliasName.includes(query) || chineseName.includes(query);
     });
   }, [people, peopleSearch]);
 
@@ -892,7 +893,7 @@ function FamilyTree() {
           id="people-search"
           className="people-search-input"
           type="search"
-          placeholder="Search by name or Chinese name"
+          placeholder="Search by name, alias, or Chinese name"
           value={peopleSearch}
           onChange={(event) => setPeopleSearch(event.target.value)}
         />
