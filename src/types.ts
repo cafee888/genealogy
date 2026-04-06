@@ -9,6 +9,7 @@ export interface LocationEvent {
 export interface Person {
   id: string;
   name: string;
+  chineseName: string | null;
   birth: {
     year: number | null;
     place: string | null;

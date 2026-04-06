@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap");
 
 :root {
   --bg-deep: #0b1420;
@@ -71,7 +71,7 @@ body::before {
 }
 
 .topbar h1 {
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: "Noto Serif SC", "Times New Roman", serif;
   letter-spacing: 0.5px;
   margin: 0;
   font-size: clamp(1.6rem, 2.7vw, 2.45rem);
@@ -124,6 +124,38 @@ body::before {
   color: var(--muted);
 }
 
+.tree-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.tree-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tree-action-btn {
+  border: 1px solid rgba(103, 232, 249, 0.46);
+  background: linear-gradient(145deg, rgba(20, 47, 68, 0.95), rgba(10, 29, 45, 0.95));
+  color: #d6eeff;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.tree-action-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.14);
+}
+
 .tree-canvas {
   height: 480px;
   margin-top: 18px;
@@ -135,6 +167,126 @@ body::before {
     radial-gradient(circle at 20% 80%, rgba(52, 211, 153, 0.18), transparent 42%),
     rgba(5, 14, 24, 0.7);
   box-shadow: inset 0 0 0 1px rgba(167, 218, 255, 0.12), inset 0 16px 34px rgba(6, 13, 20, 0.6);
+}
+
+.tree-canvas .react-flow__node {
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.tree-canvas .react-flow__node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(7, 18, 30, 0.36);
+}
+
+.tree-canvas .react-flow__edge.parent-link .react-flow__edge-path {
+  stroke: #5dd6ff;
+  stroke-width: 2.9;
+  filter: drop-shadow(0 0 6px rgba(93, 214, 255, 0.62));
+}
+
+.tree-canvas .react-flow__edge.spouse-link .react-flow__edge-path {
+  stroke: #ff6fae;
+  stroke-width: 3.1;
+  stroke-dasharray: 8 5;
+  filter: drop-shadow(0 0 7px rgba(255, 111, 174, 0.62));
+}
+
+.tree-canvas .react-flow__edge.animated path {
+  stroke-linecap: round;
+}
+
+.tree-person-node-wrap {
+  overflow: hidden;
+}
+
+.tree-person-node {
+  position: relative;
+  min-height: 92px;
+  padding: 12px 12px 10px;
+  text-align: center;
+  color: #11263a;
+}
+
+.tree-handle {
+  width: 9px;
+  height: 9px;
+  border: 1px solid rgba(17, 38, 58, 0.45);
+  background: rgba(248, 251, 255, 0.95);
+}
+
+.tree-person-node__name {
+  font-size: 1.22rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tree-person-node__chinese {
+  margin-top: 2px;
+  font-family: "Noto Serif SC", "Times New Roman", serif;
+  font-size: 0.98rem;
+  color: #2d4c67;
+}
+
+.tree-person-node__year {
+  margin-top: 3px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #1f3b58;
+}
+
+.tree-person-node__toggle {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid #3e8ab5;
+  background: linear-gradient(150deg, #f7fbff, #d4e9fb);
+  color: #18466c;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.tree-person-node__toggle:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px rgba(79, 150, 197, 0.2);
+  background: linear-gradient(150deg, #ffffff, #e4f2ff);
+}
+
+.tree-canvas .react-flow__controls {
+  border: 1px solid rgba(124, 189, 223, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.tree-canvas .react-flow__controls button {
+  background: rgba(11, 25, 38, 0.92);
+  color: #d8efff;
+  border-bottom: 1px solid rgba(124, 189, 223, 0.25);
+}
+
+.tree-canvas .react-flow__controls button:hover {
+  background: rgba(20, 48, 71, 0.96);
+}
+
+.tree-canvas .react-flow__controls button svg {
+  fill: currentColor;
+}
+
+.tree-canvas .react-flow__minimap {
+  border: 1px solid rgba(124, 189, 223, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(8, 21, 35, 0.92);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 
 .card-grid {
@@ -174,6 +326,13 @@ body::before {
   color: var(--muted);
 }
 
+.person-card__chinese {
+  margin: 6px 0 0;
+  font-family: "Noto Serif SC", "Times New Roman", serif;
+  font-size: 0.95rem;
+  color: #9fc4dd;
+}
+
 .person-layout {
   display: grid;
   gap: 18px;
@@ -191,6 +350,12 @@ body::before {
   margin: 0;
   font-size: clamp(1.6rem, 2.4vw, 2.2rem);
   text-shadow: 0 2px 16px rgba(103, 232, 249, 0.2);
+}
+
+.person-chinese-name {
+  margin: 4px 0 0;
+  font-family: "Noto Serif SC", "Times New Roman", serif;
+  color: #a8cce6;
 }
 
 .profile-section {
@@ -350,6 +515,10 @@ body::before {
   .tree-canvas {
     height: 380px;
     border-radius: 14px;
+  }
+
+  .tree-header-row {
+    flex-direction: column;
   }
 
   .profile-row {

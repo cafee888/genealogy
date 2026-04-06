@@ -22,7 +22,10 @@ function PersonPage() {
   return (
     <article className="panel person-layout">
       <div className="profile-row">
-        <h2>{person.name}</h2>
+        <div>
+          <h2>{person.name}</h2>
+          {person.chineseName && <p className="person-chinese-name">{person.chineseName}</p>}
+        </div>
         <Link to="/" className="text-link">
           Back to tree
         </Link>
@@ -30,6 +33,11 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Profile</h3>
+        {person.chineseName && (
+          <p>
+            <strong>Chinese Name:</strong> {person.chineseName}
+          </p>
+        )}
         <p>
           <strong>Birth:</strong> {person.birth.year ?? "Unknown"} {person.birth.place ? `, ${person.birth.place}` : ""}
         </p>

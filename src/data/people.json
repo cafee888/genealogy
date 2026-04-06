@@ -2,6 +2,7 @@
   {
     "id": "lim-wen-fu",
     "name": "Lim Wen Fu",
+    "chineseName": "林文福",
     "birth": {
       "year": 1912,
       "place": "Fujian, China"
@@ -39,6 +40,7 @@
   {
     "id": "lee-soon-neo",
     "name": "Lee Soon Neo",
+    "chineseName": "李顺娘",
     "birth": {
       "year": 1918,
       "place": "Ipoh, Perak, Malaysia"
@@ -71,6 +73,7 @@
   {
     "id": "lim-cheng-huat",
     "name": "Lim Cheng Huat",
+    "chineseName": "林清发",
     "birth": {
       "year": 1948,
       "place": "Sitiawan, Perak, Malaysia"
@@ -108,6 +111,7 @@
   {
     "id": "ng-yoke-lin",
     "name": "Ng Yoke Lin",
+    "chineseName": "黄玉莲",
     "birth": {
       "year": 1950,
       "place": "Klang, Selangor, Malaysia"
@@ -140,6 +144,7 @@
   {
     "id": "lim-mei-yan",
     "name": "Lim Mei Yan",
+    "chineseName": "林美燕",
     "birth": {
       "year": 1978,
       "place": "Kuala Lumpur, Malaysia"
@@ -177,6 +182,7 @@
   {
     "id": "lim-jian-wei",
     "name": "Lim Jian Wei",
+    "chineseName": "林建伟",
     "birth": {
       "year": 1982,
       "place": "Petaling Jaya, Malaysia"
@@ -214,6 +220,7 @@
   {
     "id": "tan-lucas-hao",
     "name": "Tan Lucas Hao",
+    "chineseName": "陈昊宇",
     "birth": {
       "year": 2010,
       "place": "George Town, Penang, Malaysia"
