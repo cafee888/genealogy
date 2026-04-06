@@ -55,9 +55,7 @@ function PersonNode({ id, data }: NodeProps) {
 }
 
 function getSortedByBirth(people: Person[]): Person[] {
-  return [...people].sort(
-    (a, b) => (a.birth.year ?? Number.MAX_SAFE_INTEGER) - (b.birth.year ?? Number.MAX_SAFE_INTEGER)
-  );
+  return [...people];
 }
 
 function getGenerationById(sortedByBirth: Person[]): Map<string, number> {
@@ -157,9 +155,14 @@ function extractYear(dateOrNull: string | null | undefined, yearOrNull: number |
 function getNodeYearText(person: Person): string {
   const birthYear = extractYear(person.birth.date, person.birth.year);
   const deathYear = extractYear(person.death.date, person.death.year);
+  const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
 
   if (birthYear === null) {
     return "";
+  }
+
+  if (!hasDeathInfo) {
+    return `${birthYear}`;
   }
 
   return `${birthYear} - ${deathYear ?? "Unknown"}`;
@@ -240,6 +243,10 @@ function FamilyTree() {
     const sortedByBirth = getSortedByBirth(people);
     const personById = new Map(sortedByBirth.map((person) => [person.id, person]));
     const generationById = getGenerationById(sortedByBirth);
+    const nodeGapX = 300;
+    const familyGapColumns = 0.55;
+    const regularGapColumns = 0.12;
+    const branchGroupGapColumns = 1.15;
 
     const childrenById = getChildrenById(sortedByBirth);
     const spousesById = new Map<string, string[]>();
@@ -280,6 +287,44 @@ function FamilyTree() {
       });
     }
 
+    const primaryChildrenById = new Map<string, string[]>();
+    childrenById.forEach((childIds, parentId) => {
+      const primaryChildren = childIds.filter((childId) => {
+        const child = personById.get(childId);
+        return !child || child.parents.length === 0 || child.parents[0] === parentId;
+      });
+      primaryChildrenById.set(parentId, primaryChildren);
+    });
+
+    const visibleSpanCache = new Map<string, number>();
+    const getVisibleBranchSpan = (personId: string): number => {
+      if (visibleSpanCache.has(personId)) {
+        return visibleSpanCache.get(personId)!;
+      }
+
+      if (hiddenNodeIds.has(personId)) {
+        visibleSpanCache.set(personId, 0);
+        return 0;
+      }
+
+      const visiblePrimaryChildren = (primaryChildrenById.get(personId) ?? []).filter(
+        (childId) => !hiddenNodeIds.has(childId)
+      );
+
+      if (visiblePrimaryChildren.length === 0) {
+        visibleSpanCache.set(personId, 1);
+        return 1;
+      }
+
+      const span = Math.max(
+        1,
+        visiblePrimaryChildren.reduce((sum, childId) => sum + Math.max(1, getVisibleBranchSpan(childId)), 0)
+      );
+
+      visibleSpanCache.set(personId, span);
+      return span;
+    };
+
     const groupedByGeneration = new Map<number, string[]>();
     sortedByBirth.forEach((person) => {
       const generation = generationById.get(person.id) ?? 0;
@@ -288,19 +333,54 @@ function FamilyTree() {
       groupedByGeneration.set(generation, group);
     });
 
-    const treeNodes: Node[] = [];
+    const fileOrderIndex = new Map<string, number>();
+    sortedByBirth.forEach((person, index) => {
+      fileOrderIndex.set(person.id, index);
+    });
 
-    groupedByGeneration.forEach((ids, generation) => {
-      ids.forEach((id, index) => {
-        const person = sortedByBirth.find((p) => p.id === id);
-        if (!person) {
-          return;
+    const treeNodes: Node[] = [];
+    const positionedXById = new Map<string, number>();
+
+    [...groupedByGeneration.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .forEach(([generation, ids]) => {
+      const generationSet = new Set(ids);
+      const placed = new Set<string>();
+      let cursor = 0;
+      let lastParentGroupKey: string | null = null;
+
+      const orderedIds = [...ids].sort((aId, bId) => {
+        const a = personById.get(aId);
+        const b = personById.get(bId);
+
+        const aPrimaryParent = a?.parents?.[0];
+        const bPrimaryParent = b?.parents?.[0];
+
+        const aParentX = aPrimaryParent ? positionedXById.get(aPrimaryParent) : undefined;
+        const bParentX = bPrimaryParent ? positionedXById.get(bPrimaryParent) : undefined;
+
+        if (aParentX !== undefined && bParentX !== undefined && aParentX !== bParentX) {
+          return aParentX - bParentX;
         }
+
+        if (aParentX !== undefined && bParentX === undefined) {
+          return -1;
+        }
+
+        if (aParentX === undefined && bParentX !== undefined) {
+          return 1;
+        }
+
+        return (fileOrderIndex.get(aId) ?? 0) - (fileOrderIndex.get(bId) ?? 0);
+      });
+
+      const pushNode = (person: Person, x: number, hidden: boolean) => {
+        positionedXById.set(person.id, x);
 
         treeNodes.push({
           id: person.id,
           type: "personNode",
-          position: { x: 280 * index, y: 180 * generation },
+          position: { x, y: 180 * generation },
           data: {
             name: person.name,
             chineseName: person.chineseName,
@@ -309,7 +389,7 @@ function FamilyTree() {
             collapsed: collapsedIds.has(person.id),
             onToggle: handleToggleCollapse
           },
-          hidden: hiddenNodeIds.has(person.id),
+          hidden,
           className: "tree-person-node-wrap",
           style: {
             width: 220,
@@ -320,6 +400,88 @@ function FamilyTree() {
             boxShadow: "0 8px 22px rgba(5, 15, 26, 0.25)"
           }
         });
+      };
+
+      const getDesiredCenterX = (person: Person): number | null => {
+        const parentXs = person.parents
+          .map((parentId) => positionedXById.get(parentId))
+          .filter((x): x is number => x !== undefined);
+
+        if (parentXs.length === 0) {
+          return null;
+        }
+
+        const sum = parentXs.reduce((acc, x) => acc + x, 0);
+        return sum / parentXs.length;
+      };
+
+      orderedIds.forEach((id) => {
+        if (placed.has(id)) {
+          return;
+        }
+
+        const person = personById.get(id);
+        if (!person) {
+          return;
+        }
+
+        const parentGroupKey = person.parents[0] ?? `root:${person.id}`;
+        const personHidden = hiddenNodeIds.has(person.id);
+
+        if (!personHidden && lastParentGroupKey !== null && parentGroupKey !== lastParentGroupKey) {
+          const rowBranchGap = generation === 0 ? branchGroupGapColumns : 0.25;
+          cursor += rowBranchGap;
+        }
+
+        const spouseId = person.spouses.find((spouse) => generationSet.has(spouse) && !placed.has(spouse));
+        const spouse = spouseId ? personById.get(spouseId) : undefined;
+        const spouseHidden = spouse ? hiddenNodeIds.has(spouse.id) : true;
+
+        const hasVisiblePrimaryChildren = (primaryChildrenById.get(person.id) ?? []).some(
+          (childId) => !hiddenNodeIds.has(childId)
+        );
+
+        if (!personHidden && spouse && !spouseHidden) {
+          // Keep couples adjacent, then reserve extra columns for descendant branches.
+          const personDesired = getDesiredCenterX(person);
+          const spouseDesired = getDesiredCenterX(spouse);
+          const desiredCenter = personDesired ?? spouseDesired ?? null;
+          const minLeftX = cursor * nodeGapX;
+          const leftX = Math.max(minLeftX, desiredCenter !== null ? desiredCenter - nodeGapX / 2 : minLeftX);
+
+          pushNode(person, leftX, false);
+          pushNode(spouse, leftX + nodeGapX, false);
+
+          const personSpan = Math.max(1, getVisibleBranchSpan(person.id));
+          const reservedColumns = Math.max(2, personSpan);
+          const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
+
+          cursor = leftX / nodeGapX + reservedColumns + gapAfter;
+          lastParentGroupKey = parentGroupKey;
+          placed.add(person.id);
+          placed.add(spouse.id);
+          return;
+        }
+
+        const span = personHidden ? 0 : Math.max(1, getVisibleBranchSpan(person.id));
+        const minCenterX = (cursor + (span - 1) / 2) * nodeGapX;
+        const desiredCenterX = getDesiredCenterX(person);
+        const x = personHidden ? 0 : Math.max(minCenterX, desiredCenterX ?? minCenterX);
+        pushNode(person, x, personHidden);
+
+        if (!personHidden) {
+          const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
+          const leftCol = x / nodeGapX - (span - 1) / 2;
+          cursor = leftCol + span + gapAfter;
+          lastParentGroupKey = parentGroupKey;
+        }
+
+        if (spouse) {
+          pushNode(spouse, 0, spouseHidden);
+          placed.add(spouse.id);
+        }
+
+        placed.add(person.id);
       });
     });
 
@@ -394,7 +556,7 @@ function FamilyTree() {
       <div className="panel-header">
         <div className="tree-header-row">
           <div>
-            <h2>Family Tree View</h2>
+            <h2>Family Tree</h2>
             <p>Click any person card below the graph for profile details.</p>
           </div>
           <div className="tree-actions">

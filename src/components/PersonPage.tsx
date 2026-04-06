@@ -9,6 +9,14 @@ function formatLifeEvent(event: { date?: string | null; year: number | null; pla
   return `${dateOrYear}${event.place ? `, ${event.place}` : ""}`;
 }
 
+function formatDeathEvent(event: { date?: string | null; year: number | null; place: string | null }) {
+  if (!event.date && event.year === null && event.place) {
+    return `Deceased, ${event.place}`;
+  }
+
+  return formatLifeEvent(event, "Unknown");
+}
+
 function extractYear(dateOrNull: string | null | undefined, yearOrNull: number | null): number | null {
   if (yearOrNull !== null) {
     return yearOrNull;
@@ -112,7 +120,7 @@ function PersonPage() {
         </p>
         {hasDeathInfo && (
           <p>
-            <strong>Death:</strong> <span className="multiline-text">{formatLifeEvent(person.death, "Unknown")}</span>
+            <strong>Death:</strong> <span className="multiline-text">{formatDeathEvent(person.death)}</span>
           </p>
         )}
         {hasDeathInfo && ageAtDeath !== null && (
