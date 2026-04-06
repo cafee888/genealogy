@@ -2,6 +2,10 @@ import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { getAllPhotos, getPersonById, resolveAssetUrl } from "../utils/genealogy";
 
+function formatPersonLabel(name: string, chineseName: string | null): string {
+  return chineseName ? `${name} (${chineseName})` : name;
+}
+
 interface PhotoViewLocationState {
   fromPersonId?: string;
 }
@@ -78,7 +82,7 @@ function PhotoView() {
             }
             return (
               <Link key={person.id} to={`/person/${person.id}`} className="pill-link">
-                {person.name}
+                {formatPersonLabel(person.name, person.chineseName)}
               </Link>
             );
           })}

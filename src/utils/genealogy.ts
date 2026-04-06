@@ -3,10 +3,14 @@ import photosData from "../data/photos.json";
 import type { Person, Photo } from "../types";
 
 function normalizePerson(raw: Partial<Person> & { id: string; name: string }): Person {
+  const inferredDeceased = Boolean(raw.death?.date || raw.death?.year || raw.death?.place);
+
   return {
     id: raw.id,
     name: raw.name,
     chineseName: raw.chineseName ?? null,
+    gender: raw.gender === "female" ? "female" : "male",
+    deceased: raw.deceased ?? inferredDeceased,
     birth: {
       date: raw.birth?.date ?? null,
       year: raw.birth?.year ?? null,

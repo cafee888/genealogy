@@ -1,10 +1,22 @@
-[ {
+[
+  {
     "id": "ancestor-china",
     "name": "Shea 佘 Family in China",
     "chineseName": "佘氏祖先在中国",
     "parents": [],
-    "children": ["shea-woon-mun","shea-keng-yat"],
-    "bio": "The Shea family originated from ZhongShan (中山) (formerly HeongShan 香山) in Guangdong, China. \n\nThe family has a long history in the region, with records dating back several generations. \n\n The ancestors were primarily involved in trade before some members migrated to Malaya in the early 20th century."
+    "children": [
+      "shea-woon-mun",
+      "shea-keng-yat"
+    ],
+    "bio": "The Shea family originated from ZhongShan (中山) (formerly HeongShan 香山) in Guangdong, China. \n\nThe family has a long history in the region, with records dating back several generations. \n\n The ancestors were primarily involved in trade before some members migrated to Malaya in the early 20th century.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "origin",
+        "place": "ZhongShan (中山) (formerly HeongShan 香山), Guangdong, China"
+      }
+    ]
   },
   {
     "id": "shea-woon-mun",
@@ -20,32 +32,104 @@
       "year": 1966,
       "place": "Kepong, Kuala Lumpur, Malaysia"
     },
-    "parents": ["ancestor-china"],
-    "spouses": ["tham-yoke-keng"],
-    "children": [
-      "shea-poh-sum","shea-yoke-ling","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam"
+    "burial": {
+      "place": "Kepong Chinese Cemetery",
+      "notes": "Buried beside spouse Tham Yoke Keng"
+    },
+    "parents": [
+      "ancestor-china"
     ],
-    "bio":"Woon Mun migrated to Malaya in the early 1910s, and returned to China a few times. \n When the China closed its borders, he could not return to Malaya. Woon Mun then moved to Tianjin, China for work. \n He returned to Malaya in 1958. \nWoon Mun was the younger twin brother of Keng Yat."
+    "spouses": [
+      "tham-yoke-keng"
+    ],
+    "children": [
+      "shea-poh-sum",
+      "shea-yoke-ling",
+      "shea-kong-yew",
+      "shea-kong-choy",
+      "shea-yoke-lan",
+      "shea-kong-nam"
+    ],
+    "bio": "Woon Mun migrated to Malaya in the early 1910s, and returned to China a few times. \n When the China closed its borders, he could not return to Malaya. Woon Mun then moved to Tianjin, China for work. \n He returned to Malaya in 1958. \nWoon Mun was the younger twin brother of Keng Yat.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "birth",
+        "place": "ZhongShan (中山) (formerly HeongShan 香山), Guangdong, China",
+        "year": 1890
+      },
+      {
+        "type": "migration",
+        "place": "Malaya",
+        "year": 1910
+      },
+      {
+        "type": "residence",
+        "place": "Tianjin, China",
+        "year": 1930
+      },
+      {
+        "type": "residence",
+        "place": "Kepong, Kuala Lumpur, Malaysia",
+        "year": 1958
+      }
+    ]
   },
-    {
-    "id":"tham-yoke-keng",
-    "name":"Tham Yoke Keng",
-    "chineseName":"譚玉琼",
-        "birth": {
+  {
+    "id": "tham-yoke-keng",
+    "name": "Tham Yoke Keng",
+    "chineseName": "譚玉琼",
+    "birth": {
       "date": "03-07-1890",
       "year": 1890,
-      "place": "Honulu, Hawaii, USA"
+      "place": "Honolulu, Hawaii, USA"
     },
     "death": {
       "date": "1978-08-15",
       "year": 1978,
       "place": "Kepong, Kuala Lumpur, Malaysia"
     },
-    "spouses": ["shea-woon-mun"],
-        "children": [
-      "shea-poh-sum","shea-yoke-ling","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam"
+    "burial": {
+      "place": "Kepong Chinese Cemetery",
+      "notes": " Buried beside spouse Shea Woon Mun"
+    },
+    "spouses": [
+      "shea-woon-mun"
     ],
-    "bio": "Yoke Keng was born in Hawaii, USA. \n She married Woon Mun in ZhongShan China and migrated to Malaya with him. \n Yoke Keng was known for her strong support of the family."
+    "children": [
+      "shea-poh-sum",
+      "shea-yoke-ling",
+      "shea-kong-yew",
+      "shea-kong-choy",
+      "shea-yoke-lan",
+      "shea-kong-nam"
+    ],
+    "bio": "Yoke Keng was born in Hawaii, USA. \n She married Woon Mun in ZhongShan China and migrated to Malaya with him. \n Yoke Keng was known for her strong support of the family.",
+    "gender": "female",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Honulu, Hawaii, USA",
+        "year": 1890
+      },
+      {
+        "type": "migration",
+        "place": "ZhongShan, China",
+        "year": 1910
+      },
+      {
+        "type": "migration",
+        "place": "Malaya",
+        "year": 1910
+      },
+      {
+        "type": "residence",
+        "place": "Kuala Lumpur, Malaysia",
+        "year": 1920
+      }
+    ]
   },
   {
     "id": "shea-keng-yat",
@@ -61,74 +145,194 @@
       "year": 1972,
       "place": "Kepong, Kuala Lumpur, Malaysia"
     },
-    "parents": ["ancestor-china"],
-    "bio": "Keng Yat was the elder twin brother of Woon Mun. He migrated to Malaya and subsequently settled with Woon Mun's family in Kepong, Kuala Lumpur."
+    "burial": {
+      "place": "Kepong Chinese Cemetery",
+      "notes": "Buried on the newer side of the cemetery, separate from Woon Mun and Yoke Keng"
+    },
+    "parents": [
+      "ancestor-china"
+    ],
+    "bio": "Keng Yat was the elder twin brother of Woon Mun. He migrated to Malaya and subsequently settled with Woon Mun's family in Kepong, Kuala Lumpur.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "birth",
+        "place": "ZhongShan (中山) (formerly HeongShan 香山), Guangdong, China",
+        "year": 1890
+      },
+      {
+        "type": "migration",
+        "place": "Malaya",
+        "year": 1910
+      },
+      {
+        "type": "residence",
+        "place": "Kuala Lumpur, Malaysia",
+        "year": 1910
+      }
+    ]
   },
   {
     "id": "shea-poh-sum",
     "name": "Shea Poh Sum",
     "chineseName": "佘寶森",
     "birth": {
-      "year": 1923,
+      "year": 1912,
+      "date": "1912-03-18",
       "place": "ZhongShan (中山) (formerly HeongShan 香山),\n Guangdong, China"
     },
     "death": {
-      "place": "Petaling Jaya, Selangor, Malaysia"
+      "place": "Petaling Jaya, Selangor, Malaysia",
+      "date": "1991-04-14",
+      "year": 1991
     },
-    "parents": ["shea-woon-mun","tham-yoke-keng"],
-    "spouses": ["lee-mun-kay"],
-    "children": ["shea-yuet-ming","shea-weng-keong","shea-weng-cheong","shea-yuet-seong"],
-    "bio": "Poh Sum was the son of Woon Mun and Yoke Keng. He migrated to Malaya with his parents and later part of life settled in Petaling Jaya, Selangor. \n He was an avid photographer and managed a photography business in downtown Kuala Lumpur. Poh Sum was known for his dedication to family."
+    "burial": {
+      "place": "Gui Yuan Funeral Crematorium Petaling Jaya, Selangor, Malaysia",
+      "notes": "Ashes placed in columbarium next to spouse Lee Mun Kay"
+    },
+    "parents": [
+      "shea-woon-mun",
+      "tham-yoke-keng"
+    ],
+    "spouses": [
+      "lee-mun-kay"
+    ],
+    "children": [
+      "shea-yuet-ming",
+      "shea-weng-keong",
+      "shea-weng-cheong",
+      "shea-yuet-seong"
+    ],
+    "bio": "Poh Sum was the son of Woon Mun and Yoke Keng. He migrated to Malaya with his parents and later part of life settled in Petaling Jaya, Selangor. \n He was an avid photographer and managed a photography business in downtown Kuala Lumpur. Poh Sum was known for his dedication to family.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "birth",
+        "place": "ZhongShan (中山) (formerly HeongShan 香山), Guangdong, China",
+        "year": 1912
+      },
+      {
+        "type": "migration",
+        "place": "Malaya",
+        "year": 1910
+      },
+      {
+        "type": "residence",
+        "place": "Petaling Jaya, Selangor, Malaysia",
+        "year": 1950
+      }
+    ]
   },
   {
     "id": "lee-mun-kay",
     "name": "Lee Mun Kay",
+    "chineseName": "李文琪",
     "birth": {
       "place": "Malaya",
       "year": 1923,
       "date": "1923-11-20"
     },
     "death": {
-      "date":"2015-09-02",
-      "year":2015,
+      "date": "2015-09-02",
+      "year": 2015,
       "place": "Shah Alam, Selangor, Malaysia"
     },
-    "parents": [],
-    "spouses": ["shea-poh-sum"],
-    "children": ["shea-yuet-ming","shea-weng-keong","shea-weng-cheong","shea-yuet-seong"],
-    "bio": "Mun Kay was born in Malaya. She married Poh Sum and lived in Petaling Jaya, Selangor."   
-  },
-  {
-    "id":"shea-yuet-ming",
-    "name":"Shea Yuet Ming",
-    "chineseName":"佘月明",
-    "birth": {    
-      "place": "Malaysia"
+    "burial": {
+      "place": "Gui Yuan Funeral Crematorium Petaling Jaya, Selangor, Malaysia",
+      "notes": "Ashes placed in columbarium next to spouse Shea Poh Sum"
     },
-    "parents": ["shea-poh-sum","lee-mun-kay"],
-    "bio": "Yuet Ming was the eldest daughter of Poh Sum and Mun Kay."
+    "parents": [],
+    "spouses": [
+      "shea-poh-sum"
+    ],
+    "children": [
+      "shea-yuet-ming",
+      "shea-weng-keong",
+      "shea-weng-cheong",
+      "shea-yuet-seong"
+    ],
+    "bio": "Mun Kay was born in Malaya. She married Poh Sum and lived in Petaling Jaya, Selangor.",
+    "gender": "female",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Malaya",
+        "year": 1923
+      },
+      {
+        "type": "residence",
+        "place": "Petaling Jaya, Selangor, Malaysia",
+        "year": 1950
+      },
+      {
+        "type": "residence",
+        "place": "Shah Alam, Selangor, Malaysia",
+        "year": 1997
+      }
+    ]
   },
   {
-    "id":"shea-weng-keong",
-    "name":"Shea Weng Keong",
-    "chineseName":"佘永強",
+    "id": "shea-yuet-ming",
+    "name": "Shea Yuet Ming",
+    "chineseName": "佘月明",
     "birth": {
       "place": "Malaysia"
-    },  
-    "death":{
-      "place": "Malaysia"
     },
-    "parents": ["shea-poh-sum","lee-mun-kay"],
-    "bio": "Weng Keong was the eldest son of Poh Sum and Mun Kay. He unfortunately passed away at a young age."
+    "parents": [
+      "shea-poh-sum",
+      "lee-mun-kay"
+    ],
+    "bio": "Yuet Ming was the eldest daughter of Poh Sum and Mun Kay.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-weng-cheong",
-    "name":"Shea Weng Cheong",  
-    "chineseName":"佘永昌",
+    "id": "shea-weng-keong",
+    "name": "Shea Weng Keong",
+    "chineseName": "佘永強",
+    "birth": {
+      "place": "Malaysia"
+    },
+    "death": {
+      "place": "Malaysia"
+    },
+    "burial": {
+      "place": "Unknown",
+      "notes": "Burial place unknown"
+    },
+    "parents": [
+      "shea-poh-sum",
+      "lee-mun-kay"
+    ],
+    "bio": "Weng Keong was the eldest son of Poh Sum and Mun Kay. He unfortunately passed away at a young age.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "shea-weng-cheong",
+    "name": "Shea Weng Cheong",
+    "chineseName": "佘永昌",
     "birth": {
       "place": "Malaysia",
-      "date":"1947-06-29",
-      "year": 1947    
+      "date": "1947-06-29",
+      "year": 1947
     },
     "locations": [
       {
@@ -142,37 +346,68 @@
         "year": 1997
       }
     ],
-      "parents": ["shea-poh-sum","lee-mun-kay"],
-      "children":["shea-wai-leong","shea-wai-ling"],
-      "spouses": ["lee-bee-loo"],
-      "bio": "Weng Cheong is the second son of Poh Sum and Mun Kay. He was in the medical field in Kuala Lumpur. He now lives in Shah Alam, Selangor, Malaysia."
+    "parents": [
+      "shea-poh-sum",
+      "lee-mun-kay"
+    ],
+    "children": [
+      "shea-wai-leong",
+      "shea-wai-ling"
+    ],
+    "spouses": [
+      "lee-bee-loo"
+    ],
+    "bio": "Weng Cheong is the second son of Poh Sum and Mun Kay. He was in the medical field in Kuala Lumpur. He now lives in Shah Alam, Selangor, Malaysia.",
+    "gender": "male",
+    "deceased": false
   },
   {
-    "id":"lee-bee-loo",
-    "name":"Lee Bee Loo",
+    "id": "lee-bee-loo",
+    "name": "Lee Bee Loo",
+    "chineseName": "李美如",
     "birth": {
       "place": "Malaysia",
-      "year":1948,
-      "date":"1948-10-31"
+      "year": 1948,
+      "date": "1948-10-31"
     },
     "parents": [],
-    "spouses": ["shea-weng-cheong"],
-    "children":["shea-wai-leong","shea-wai-ling"],
-    "bio": "Bee Loo was born in Malaysia. She married Weng Cheong and lives in Shah Alam, Selangor, Malaysia."
+    "spouses": [
+      "shea-weng-cheong"
+    ],
+    "children": [
+      "shea-wai-leong",
+      "shea-wai-ling"
+    ],
+    "bio": "Bee Loo was born in Malaysia. She married Weng Cheong and lives in Shah Alam, Selangor, Malaysia.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-wai-leong",
-    "name":"Shea Wai Leong",
-    "chineseName":"佘偉量",
+    "id": "shea-wai-leong",
+    "name": "Shea Wai Leong",
+    "chineseName": "佘偉量",
     "birth": {
       "place": "Malaysia",
-      "date":"1974-05-31",
+      "date": "1974-05-31",
       "year": 1974
     },
-    "parents": ["shea-weng-cheong"],
-    "children": ["shea-wan-hoe"],
-    "spouses":["elaine-chen"],
-    "locations":[
+    "parents": [
+      "shea-weng-cheong"
+    ],
+    "children": [
+      "shea-wan-hoe"
+    ],
+    "spouses": [
+      "elaine-chen"
+    ],
+    "locations": [
       {
         "type": "birth",
         "place": "Petaling Jaya, Selangor, Malaysia",
@@ -194,20 +429,27 @@
         "year": 1998
       }
     ],
-    "bio": "Wai Leong is the eldest son of Weng Cheong. He was born in Petaling Jaya, Selangor, Malaysia, and later moved to Winnipeg, Manitoba, Canada for studies. \n\nHe returned to Malaysia in 1996 and currently lives in Shah Alam, Selangor. \n\n He also maintains the genealogy records for the family."
+    "bio": "Wai Leong is the eldest son of Weng Cheong. He was born in Petaling Jaya, Selangor, Malaysia, and later moved to Winnipeg, Manitoba, Canada for studies. \n\nHe returned to Malaysia in 1996 and currently lives in Shah Alam, Selangor. \n\n He also maintains the genealogy records for the family.",
+    "gender": "male",
+    "deceased": false
   },
-  { 
-    "id":"elaine-chen",
-    "name":"Elaine Chen", 
+  {
+    "id": "elaine-chen",
+    "name": "Elaine Chen Li Peng",
+    "chineseName": "曾莉萍",
     "birth": {
       "place": "Malaysia",
       "year": 1977,
-      "date":"1977-10-25"
-    },  
+      "date": "1977-10-25"
+    },
     "parents": [],
-    "spouses": ["shea-wai-leong"],
-    "children":["shea-wan-hoe"],
-    "locations":[ 
+    "spouses": [
+      "shea-wai-leong"
+    ],
+    "children": [
+      "shea-wan-hoe"
+    ],
+    "locations": [
       {
         "type": "birth",
         "place": "Kuala Lumpur, Malaysia",
@@ -219,18 +461,20 @@
         "year": 1998
       }
     ],
-    "bio": "Elaine Chen was born in Kuala Lumpur, Malaysia. She married Wai Leong and currently lives in Shah Alam, Selangor, Malaysia."
+    "bio": "Elaine Chen was born in Kuala Lumpur, Malaysia. She married Wai Leong and currently lives in Shah Alam, Selangor, Malaysia.",
+    "gender": "female",
+    "deceased": false
   },
   {
-    "id":"shea-wan-hoe",
-    "name":"Shea Wan Hoe",
-    "chineseName":"佘運豪", 
+    "id": "shea-wan-hoe",
+    "name": "Shea Wan Hoe",
+    "chineseName": "佘運豪",
     "birth": {
       "place": "Malaysia",
-      "date":"2005-04-12",
+      "date": "2005-04-12",
       "year": 2005
     },
-    "locations":[
+    "locations": [
       {
         "type": "birth",
         "place": "Shah Alam, Selangor, Malaysia",
@@ -242,19 +486,23 @@
         "year": 2024
       }
     ],
-    "parents": ["shea-wai-leong"],
-    "bio": "Wan Hoe is the only child of Wai Leong. He was born in Shah Alam, Selangor, Malaysia, and currently studying in Melaka, Malaysia."
+    "parents": [
+      "shea-wai-leong"
+    ],
+    "bio": "Wan Hoe is the only child of Wai Leong. He was born in Shah Alam, Selangor, Malaysia, and currently studying in Melaka, Malaysia.",
+    "gender": "male",
+    "deceased": false
   },
   {
-    "id":"shea-wai-ling",
-    "name":"Shea Wai Ling",
-    "chineseName":"佘惠淩",
+    "id": "shea-wai-ling",
+    "name": "Shea Wai Ling",
+    "chineseName": "佘惠淩",
     "birth": {
       "place": "Malaysia",
-      "date":"1976-03-20",
+      "date": "1976-03-20",
       "year": 1976
     },
-    "locations":[
+    "locations": [
       {
         "type": "birth",
         "place": "Petaling Jaya, Selangor, Malaysia",
@@ -265,24 +513,41 @@
         "place": "Shah Alam, Selangor, Malaysia",
         "year": 1998
       },
-     {
+      {
         "type": "residence",
         "place": "Singapore",
         "year": 2017
       }
     ],
-    "parents": ["shea-weng-cheong","lee-bee-loo"],
-    "bio": "Wai Ling is the second child and only daughter of Weng Cheong. She was born in Petaling Jaya, Selangor, Malaysia, and later moved to Shah Alam, Selangor, Malaysia. She currently lives in Singapore."
+    "parents": [
+      "shea-weng-cheong",
+      "lee-bee-loo"
+    ],
+    "bio": "Wai Ling is the second child and only daughter of Weng Cheong. She was born in Petaling Jaya, Selangor, Malaysia, and later moved to Shah Alam, Selangor, Malaysia. She currently lives in Singapore.",
+    "gender": "female",
+    "deceased": false
   },
   {
-    "id":"shea-yuet-seong",
-    "name":"Shea Yuet Seong",
-    "chineseName":"佘月嫦",
+    "id": "shea-yuet-seong",
+    "name": "Shea Yuet Seong",
+    "chineseName": "佘月嫦",
     "birth": {
       "place": "Malaysia"
     },
-    "parents": ["shea-poh-sum","lee-mun-kay"],
-    "bio": "Yuet Seong is the second daughter of Poh Sum and Mun Kay."
+    "parents": [
+      "shea-poh-sum",
+      "lee-mun-kay"
+    ],
+    "bio": "Yuet Seong is the second daughter of Poh Sum and Mun Kay.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
     "id": "shea-yoke-ling",
@@ -294,175 +559,371 @@
     "death": {
       "place": "Petaling Jaya, Selangor, Malaysia"
     },
-    "parents": ["shea-woon-mun","tham-yoke-keng"],
-    "bio": "Yoke Ling was the daughter of Woon Mun and Yoke Keng. She was born in Malaya."
+    "parents": [
+      "shea-woon-mun",
+      "tham-yoke-keng"
+    ],
+    "bio": "Yoke Ling was the daughter of Woon Mun and Yoke Keng. She was born in Malaya.",
+    "gender": "female",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-kong-yew",
-    "name":"Shea Kong Yew", 
-    "chineseName":"佘光耀",
+    "id": "shea-kong-yew",
+    "name": "Shea Kong Yew",
+    "chineseName": "佘光耀",
     "birth": {
       "place": "Malaya"
     },
     "death": {
       "place": "Malaysia"
     },
-    "parents": ["shea-woon-mun","tham-yoke-keng"],
-    "children":["shea-kok-wai", "shea-siew-yin","shea-mei-yin"],
-    "bio": "Kong Yew was the son of Woon Mun and Yoke Keng. He was born in Malaya."
+    "parents": [
+      "shea-woon-mun",
+      "tham-yoke-keng"
+    ],
+    "children": [
+      "shea-kok-wai",
+      "shea-siew-yin",
+      "shea-mei-yin"
+    ],
+    "bio": "Kong Yew was the son of Woon Mun and Yoke Keng. He was born in Malaya.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-kok-wai",
-    "name":"Shea Kok Wai",
-    "chineseName":"佘国威",
+    "id": "shea-kok-wai",
+    "name": "Shea Kok Wai",
+    "chineseName": "佘国威",
     "birth": {
       "place": "Malaysia"
     },
-    "parents": ["shea-kong-yew"],
-    "bio": "Kok Wai was the eldest son of Kong Yew."
+    "parents": [
+      "shea-kong-yew"
+    ],
+    "bio": "Kok Wai was the eldest son of Kong Yew.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-siew-yin",
-    "name":"Shea Siew Yin",
-    "chineseName":"佘小燕",
+    "id": "shea-siew-yin",
+    "name": "Shea Siew Yin",
+    "chineseName": "佘小燕",
     "birth": {
       "place": "Malaysia"
     },
-    "parents": ["shea-kong-yew"],
-    "bio": "Siew Yin was the daughter of Kong Yew."
+    "parents": [
+      "shea-kong-yew"
+    ],
+    "bio": "Siew Yin was the daughter of Kong Yew.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-mei-yin",
-    "name":"Shea Mei Yin",
-    "chineseName":"佘美燕",
-     "birth": {
-      "place": "Malaysia"
-    },
-    "parents": ["shea-kong-yew"],
-    "bio": "Mei Yin was the daughter of Kong Yew."
-  },
-  {
-    "id":"shea-kong-nam",
-    "name":"Shea Kong Nam",
-    "chineseName":"佘光南",
-    "birth": {
-      "place": "Malaya"
-    },
-    "death": {
-      "place": "Malaysia"
-    },
-    "parents": ["shea-woon-mun","tham-yoke-keng"],    
-    "children":["shea-chee-wang"],
-    "bio": "Kong Nam was the son of Woon Mun and Yoke Keng. He was born in Malaya."
-  },
-  {
-    "id":"shea-chee-wang",
-    "name":"Bernard Shea Chee Wang",
-    "chineseName":"佘志宏",
+    "id": "shea-mei-yin",
+    "name": "Shea Mei Yin",
+    "chineseName": "佘美燕",
     "birth": {
       "place": "Malaysia"
     },
-    "parents": ["shea-kong-nam"],
-    "children":["shea-wai-yee","shea-wai-hoh"],
-    "bio": "Chee Wang was the son of Kong Nam."
+    "parents": [
+      "shea-kong-yew"
+    ],
+    "bio": "Mei Yin was the daughter of Kong Yew.",
+    "gender": "female",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-wai-yee",
-    "name":"Michelle Shea Wai Yee",
-    "chineseName":"佘慧仪",
-    "birth": {
-      "place": "Malaysia"
-    },
-    "parents": ["shea-chee-wang"],
-    "bio": "Michelle Wai Yee is the daughter of Chee Wang."
-  },
-  {
-    "id":"shea-wai-hoh",
-    "name":"Maximilian Shea Wai Hoh",
-    "chineseName":"佘伟浩",
-    "birth": {
-      "place": "Malaysia"
-    },
-    "parents": ["shea-chee-wang"],
-    "children":["jaden-max-shea"],
-    "bio": "Wai Hoh is the son of Chee Wang."
-  },
-  {
-    "id":"jaden-max-shea",
-    "name":"Jaden Max Shea",
-    "chineseName":"佘俊希",
-    "birth": {
-      "place": "Malaysia"
-    },
-    "parents": ["shea-wai-hoh"],
-    "bio": "Jaden Max is the son of Wai Hoh."
-  },
-  {
-    "id":"shea-yoke-lan",
-    "name":"Shea Yoke Lan",
-    "chineseName":"佘玉蘭",
+    "id": "shea-kong-nam",
+    "name": "Shea Kong Nam",
+    "chineseName": "佘光南",
     "birth": {
       "place": "Malaya"
     },
     "death": {
       "place": "Malaysia"
     },
-    "parents": ["shea-woon-mun","tham-yoke-keng"],    
-    "bio": "Yoke Lan was the daughter of Woon Mun and Yoke Keng. She was born in Malaya."
+    "parents": [
+      "shea-woon-mun",
+      "tham-yoke-keng"
+    ],
+    "children": [
+      "shea-chee-wang"
+    ],
+    "bio": "Kong Nam was the son of Woon Mun and Yoke Keng. He was born in Malaya.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-kong-choy",
-    "name":"Shea Kong Choy (Shea Thean Choy)",
-    "chineseName":"佘光忠",
+    "id": "shea-chee-wang",
+    "name": "Bernard Shea Chee Wang",
+    "chineseName": "佘志宏",
+    "birth": {
+      "place": "Malaysia"
+    },
+    "parents": [
+      "shea-kong-nam"
+    ],
+    "children": [
+      "shea-wai-yee",
+      "shea-wai-hoh"
+    ],
+    "bio": "Chee Wang was the son of Kong Nam.",
+    "gender": "male",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "shea-wai-yee",
+    "name": "Michelle Shea Wai Yee",
+    "chineseName": "佘慧仪",
+    "birth": {
+      "place": "Malaysia"
+    },
+    "parents": [
+      "shea-chee-wang"
+    ],
+    "bio": "Michelle Wai Yee is the daughter of Chee Wang.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "shea-wai-hoh",
+    "name": "Maximilian Shea Wai Hoh",
+    "chineseName": "佘伟浩",
+    "birth": {
+      "place": "Malaysia"
+    },
+    "parents": [
+      "shea-chee-wang"
+    ],
+    "children": [
+      "jaden-max-shea"
+    ],
+    "bio": "Wai Hoh is the son of Chee Wang.",
+    "gender": "male",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "jaden-max-shea",
+    "name": "Jaden Max Shea",
+    "chineseName": "佘俊希",
+    "birth": {
+      "place": "Malaysia"
+    },
+    "parents": [
+      "shea-wai-hoh"
+    ],
+    "bio": "Jaden Max is the son of Wai Hoh.",
+    "gender": "male",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "shea-yoke-lan",
+    "name": "Shea Yoke Lan",
+    "chineseName": "佘玉蘭",
     "birth": {
       "place": "Malaya"
     },
     "death": {
       "place": "Malaysia"
     },
-    "parents": ["shea-woon-mun","tham-yoke-keng"],     
-    "children":["shea-tuck-wai","shea-shook-fung","shea-shook-fong","shea-yee-wai"],
-    "bio": "Kong Choy was the son of Woon Mun and Yoke Keng. He was born in Malaya."
+    "parents": [
+      "shea-woon-mun",
+      "tham-yoke-keng"
+    ],
+    "bio": "Yoke Lan was the daughter of Woon Mun and Yoke Keng. She was born in Malaya.",
+    "gender": "female",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-tuck-wai",
-    "name":"Shea Tuck Wai",
-    "chineseName":"佘德偉",
+    "id": "shea-kong-choy",
+    "name": "Shea Kong Choy (Shea Thean Choy)",
+    "chineseName": "佘光忠",
+    "birth": {
+      "place": "Malaya"
+    },
+    "death": {
+      "place": "Malaysia"
+    },
+    "parents": [
+      "shea-woon-mun",
+      "tham-yoke-keng"
+    ],
+    "children": [
+      "shea-tuck-wai",
+      "shea-shook-fung",
+      "shea-shook-fong",
+      "shea-yee-wai"
+    ],
+    "bio": "Kong Choy was the son of Woon Mun and Yoke Keng. He was born in Malaya.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "shea-tuck-wai",
+    "name": "Shea Tuck Wai",
+    "chineseName": "佘德偉",
     "birth": {
       "place": "Malaysia"
     },
-    "parents": ["shea-kong-choy"],
-    "bio": "Tuck Wai was the eldest son of Kong Choy."
+    "parents": [
+      "shea-kong-choy"
+    ],
+    "bio": "Tuck Wai was the eldest son of Kong Choy.",
+    "gender": "male",
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-shook-fung",
-    "name":"Shea Shook Fung",
-    "chineseName":"佘淑芬",
+    "id": "shea-shook-fung",
+    "name": "Shea Shook Fung",
+    "chineseName": "佘淑芬",
     "birth": {
       "place": "Malaysia"
-    },  
-    "parents": ["shea-kong-choy"],
-    "bio": "Shook Fung was the eldest daughter of Kong Choy."   
-  } ,
-  {
-    "id":"shea-shook-fong",
-    "name":"Shea Shook Fong",
-    "chineseName":"佘淑芳",
-    "birth": {
-      "place": "Malaysia"
-    },  
-    "parents": ["shea-kong-choy"],
-    "bio": "Shook Fong was the second daughter of Kong Choy."   
+    },
+    "parents": [
+      "shea-kong-choy"
+    ],
+    "bio": "Shook Fung was the eldest daughter of Kong Choy.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
   },
   {
-    "id":"shea-yee-wai",
-    "name":"Shea Yee Wai",
-    "chineseName":"佘裕偉",
+    "id": "shea-shook-fong",
+    "name": "Shea Shook Fong",
+    "chineseName": "佘淑芳",
     "birth": {
       "place": "Malaysia"
-    },  
-    "parents": ["shea-kong-choy"],
-    "bio": "Yee Wai was the second son of Kong Choy."   
-   }
-  
+    },
+    "parents": [
+      "shea-kong-choy"
+    ],
+    "bio": "Shook Fong was the second daughter of Kong Choy.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "shea-yee-wai",
+    "name": "Shea Yee Wai",
+    "chineseName": "佘裕偉",
+    "birth": {
+      "place": "Malaysia"
+    },
+    "parents": [
+      "shea-kong-choy"
+    ],
+    "bio": "Yee Wai was the second son of Kong Choy.",
+    "gender": "male",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  }
 ]

@@ -4,6 +4,10 @@ import PhotoGallery from "./PhotoGallery";
 import { getPersonById, getPhotosForPerson, getRelatives } from "../utils/genealogy";
 import type { Person } from "../types";
 
+function formatPersonLabel(person: Pick<Person, "name" | "chineseName">): string {
+  return person.chineseName ? `${person.name} (${person.chineseName})` : person.name;
+}
+
 function formatLifeEvent(event: { date?: string | null; year: number | null; place: string | null }, fallback: string) {
   const dateOrYear = event.date ?? event.year ?? fallback;
   return `${dateOrYear}${event.place ? `, ${event.place}` : ""}`;
@@ -14,14 +18,6 @@ function normalizeBioToPresentTense(text: string): string {
     .replace(/\bwas\b/gi, "is")
     .replace(/\bwere\b/gi, "are")
     .replace(/\bhad\b/gi, "has");
-}
-
-function formatDeathEvent(event: { date?: string | null; year: number | null; place: string | null }) {
-  if (!event.date && event.year === null && event.place) {
-    return `Deceased, ${event.place}`;
-  }
-
-  return formatLifeEvent(event, "Unknown");
 }
 
 function extractYear(dateOrNull: string | null | undefined, yearOrNull: number | null): number | null {
@@ -100,8 +96,23 @@ function PersonPage() {
 
   const relatives = getRelatives(person.id);
   const photos = getPhotosForPerson(person.id);
-  const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
+  const isDeceased = person.deceased;
   const ageAtDeath = calculateAgeAtDeath(person);
+
+  const renderRelativeLinks = (items: Person[]) => {
+    if (items.length === 0) {
+      return "None listed";
+    }
+
+    return items.map((relative, index) => (
+      <span key={relative.id}>
+        <Link to={`/person/${relative.id}`} className="text-link">
+          {formatPersonLabel(relative)}
+        </Link>
+        {index < items.length - 1 ? ", " : ""}
+      </span>
+    ));
+  };
 
   return (
     <article className="panel person-layout">
@@ -123,14 +134,15 @@ function PersonPage() {
           </p>
         )}
         <p>
+          <strong>Gender:</strong> {person.gender === "female" ? "Female" : "Male"}
+        </p>
+        <p>
           <strong>Birth:</strong> <span className="multiline-text">{formatLifeEvent(person.birth, "Unknown")}</span>
         </p>
-        {hasDeathInfo && (
-          <p>
-            <strong>Death:</strong> <span className="multiline-text">{formatDeathEvent(person.death)}</span>
-          </p>
-        )}
-        {hasDeathInfo && ageAtDeath !== null && (
+        <p>
+          <strong>Status:</strong> {isDeceased ? "Deceased" : "Living"}
+        </p>
+        {isDeceased && ageAtDeath !== null && (
           <p>
             <strong>Age at death:</strong> {ageAtDeath}
           </p>
@@ -145,56 +157,26 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Bio</h3>
-        <p className="multiline-text">{normalizeBioToPresentTense(person.bio)}</p>
+        <p className="multiline-text">{isDeceased ? person.bio : normalizeBioToPresentTense(person.bio)}</p>
       </section>
 
       <section className="profile-section relatives-list">
         <h3>Relatives</h3>
         <p>
           <strong>Parents:</strong>{" "}
-          {relatives.parents.length > 0
-            ? relatives.parents.map((parent) => (
-                <Link key={parent.id} to={`/person/${parent.id}`} className="text-link">
-                  {parent.name}
-                </Link>
-              ))
-            : "None listed"}
+          {renderRelativeLinks(relatives.parents)}
         </p>
         <p>
           <strong>Spouses:</strong>{" "}
-          {relatives.spouses.length > 0
-            ? relatives.spouses.map((spouse) => (
-                <Link key={spouse.id} to={`/person/${spouse.id}`} className="text-link">
-                  {spouse.name}
-                </Link>
-              ))
-            : "None listed"}
+          {renderRelativeLinks(relatives.spouses)}
         </p>
         <p>
           <strong>Siblings:</strong>{" "}
-          {relatives.siblings.length > 0
-            ? relatives.siblings.map((sibling, index) => (
-                <span key={sibling.id}>
-                  <Link to={`/person/${sibling.id}`} className="text-link">
-                    {sibling.name}
-                  </Link>
-                  {index < relatives.siblings.length - 1 ? ", " : ""}
-                </span>
-              ))
-            : "None listed"}
+          {renderRelativeLinks(relatives.siblings)}
         </p>
         <p>
           <strong>Children:</strong>{" "}
-          {relatives.children.length > 0
-            ? relatives.children.map((child, index) => (
-                <span key={child.id}>
-                  <Link to={`/person/${child.id}`} className="text-link">
-                    {child.name}
-                  </Link>
-                  {index < relatives.children.length - 1 ? ", " : ""}
-                </span>
-              ))
-            : "None listed"}
+          {renderRelativeLinks(relatives.children)}
         </p>
       </section>
 

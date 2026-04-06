@@ -10,6 +10,8 @@ export interface Person {
   id: string;
   name: string;
   chineseName: string | null;
+  gender: "male" | "female";
+  deceased: boolean;
   birth: {
     date?: string | null;
     year: number | null;

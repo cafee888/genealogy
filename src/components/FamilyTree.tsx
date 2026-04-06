@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Background,
@@ -16,10 +16,15 @@ import "@xyflow/react/dist/style.css";
 import { getAllPeople } from "../utils/genealogy";
 import type { Person } from "../types";
 
+const MIN_TREE_ZOOM = 0.2;
+const LEVEL3_GENERATION_INDEX = 2;
+const TREE_LAYOUT_STORAGE_KEY = "genealogy.tree.layout";
+
 interface PersonNodeData {
   name: string;
   chineseName: string | null;
   yearText: string | null;
+  deceased: boolean;
   canExpand: boolean;
   collapsed: boolean;
   onToggle: (id: string) => void;
@@ -29,7 +34,7 @@ function PersonNode({ id, data }: NodeProps) {
   const personData = data as unknown as PersonNodeData;
 
   return (
-    <div className="tree-person-node">
+    <div className={`tree-person-node${personData.deceased ? " tree-person-node--deceased" : ""}`}>
       <Handle type="target" position={Position.Top} id="top" className="tree-handle" />
       <Handle type="source" position={Position.Bottom} id="bottom" className="tree-handle" />
       <Handle type="target" position={Position.Left} id="left" className="tree-handle" />
@@ -156,13 +161,16 @@ function extractYear(dateOrNull: string | null | undefined, yearOrNull: number |
 function getNodeYearText(person: Person): string {
   const birthYear = extractYear(person.birth.date, person.birth.year);
   const deathYear = extractYear(person.death.date, person.death.year);
-  const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
 
   if (birthYear === null) {
-    return "";
+    if (!person.deceased) {
+      return "";
+    }
+
+    return deathYear !== null ? `Unknown - ${deathYear}` : "";
   }
 
-  if (!hasDeathInfo) {
+  if (!person.deceased) {
     return `${birthYear}`;
   }
 
@@ -172,17 +180,24 @@ function getNodeYearText(person: Person): string {
 function getCardYearText(person: Person): string {
   const birthYear = extractYear(person.birth.date, person.birth.year);
   const deathYear = extractYear(person.death.date, person.death.year);
-  const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
 
-  if (!hasDeathInfo) {
-    return `${birthYear ?? "Unknown"}`;
+  if (!person.deceased) {
+    return birthYear !== null ? `${birthYear} - Present` : "";
+  }
+
+  if (birthYear !== null && deathYear !== null) {
+    return `${birthYear} - ${deathYear}`;
+  }
+
+  if (birthYear !== null) {
+    return `${birthYear}`;
   }
 
   if (deathYear !== null) {
-    return `${birthYear ?? "Unknown"} - ${deathYear}`;
+    return `${deathYear}`;
   }
 
-  return `${birthYear ?? "Unknown"} - Deceased`;
+  return "";
 }
 
 function getExpandableIds(people: Person[]): Set<string> {
@@ -232,12 +247,62 @@ function getInitialCollapsedIds(people: Person[]): Set<string> {
 function FamilyTree() {
   const people = getAllPeople();
   const navigate = useNavigate();
+  const reactFlowRef = useRef<ReactFlowInstance | null>(null);
+  const [isLeftToRightLayout, setIsLeftToRightLayout] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    const savedLayout = window.sessionStorage.getItem(TREE_LAYOUT_STORAGE_KEY);
+    if (savedLayout === "left-right") {
+      return true;
+    }
+
+    if (savedLayout === "top-down") {
+      return false;
+    }
+
+    return window.matchMedia("(max-width: 900px)").matches;
+  });
   const hasCenteredInitiallyRef = useRef(false);
   const defaultCollapsedIds = useMemo(() => getInitialCollapsedIds(people), [people]);
+  const personById = useMemo(() => new Map(people.map((person) => [person.id, person])), [people]);
+  const generationById = useMemo(() => getGenerationById(getSortedByBirth(people)), [people]);
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => new Set(defaultCollapsedIds));
+  const [isExpandAllMode, setIsExpandAllMode] = useState(false);
   const [showTopGenerationOnly, setShowTopGenerationOnly] = useState(false);
   const [peopleSearch, setPeopleSearch] = useState("");
   const expandableIds = useMemo(() => getExpandableIds(people), [people]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 900px)");
+
+    const hasSavedLayoutPreference = () => {
+      const savedLayout = window.sessionStorage.getItem(TREE_LAYOUT_STORAGE_KEY);
+      return savedLayout === "left-right" || savedLayout === "top-down";
+    };
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      if (!hasSavedLayoutPreference()) {
+        setIsLeftToRightLayout(event.matches);
+      }
+    };
+
+    if (!hasSavedLayoutPreference()) {
+      setIsLeftToRightLayout(media.matches);
+    }
+
+    media.addEventListener("change", handleChange);
+
+    return () => {
+      media.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Recenter after orientation switches between desktop and mobile layouts.
+    hasCenteredInitiallyRef.current = false;
+  }, [isLeftToRightLayout]);
 
   const filteredPeople = useMemo(() => {
     const query = peopleSearch.trim().toLowerCase();
@@ -254,13 +319,98 @@ function FamilyTree() {
 
   const handleToggleCollapse = useCallback((personId: string) => {
     setShowTopGenerationOnly(false);
+    setIsExpandAllMode(false);
+    const wasCollapsed = collapsedIds.has(personId);
+
     setCollapsedIds((previous) => {
       const next = new Set(previous);
-      if (next.has(personId)) {
-        next.delete(personId);
-      } else {
+      const isCurrentlyCollapsed = next.has(personId);
+
+      if (!isCurrentlyCollapsed) {
         next.add(personId);
+        return next;
       }
+
+      next.delete(personId);
+
+      const generation = generationById.get(personId) ?? 0;
+      const shouldAutoCollapseOtherBranches = generation >= LEVEL3_GENERATION_INDEX && !isExpandAllMode;
+
+      if (shouldAutoCollapseOtherBranches) {
+        const exemptLevel3Ids = new Set<string>();
+        const visited = new Set<string>();
+        const stack = [personId];
+
+        while (stack.length > 0) {
+          const currentId = stack.pop();
+          if (!currentId || visited.has(currentId)) {
+            continue;
+          }
+
+          visited.add(currentId);
+
+          const currentGeneration = generationById.get(currentId) ?? 0;
+          if (currentGeneration === LEVEL3_GENERATION_INDEX) {
+            exemptLevel3Ids.add(currentId);
+          }
+
+          if (currentGeneration <= LEVEL3_GENERATION_INDEX) {
+            continue;
+          }
+
+          const currentPerson = personById.get(currentId);
+          currentPerson?.parents.forEach((parentId) => {
+            stack.push(parentId);
+          });
+        }
+
+        expandableIds.forEach((expandableId) => {
+          if (expandableId === personId) {
+            return;
+          }
+
+          const expandableGeneration = generationById.get(expandableId) ?? 0;
+          if (
+            expandableGeneration === LEVEL3_GENERATION_INDEX &&
+            !exemptLevel3Ids.has(expandableId)
+          ) {
+            next.add(expandableId);
+          }
+        });
+      }
+
+      return next;
+    });
+
+    if (wasCollapsed) {
+      requestAnimationFrame(() => {
+        const instance = reactFlowRef.current;
+        if (!instance) {
+          return;
+        }
+
+        const node = instance.getNode(personId);
+        if (!node || node.hidden) {
+          return;
+        }
+
+        const nodeWidth = node.measured?.width ?? node.width ?? 220;
+        const nodeHeight = node.measured?.height ?? node.height ?? 92;
+        const nodeX = node.position.x;
+        const nodeY = node.position.y;
+
+        instance.setCenter(nodeX + nodeWidth / 2, nodeY + nodeHeight / 2, {
+          duration: 220,
+          zoom: instance.getZoom()
+        });
+      });
+    }
+  }, [collapsedIds, expandableIds, generationById, isExpandAllMode, personById]);
+
+  const handleToggleLayout = useCallback(() => {
+    setIsLeftToRightLayout((previous) => {
+      const next = !previous;
+      window.sessionStorage.setItem(TREE_LAYOUT_STORAGE_KEY, next ? "left-right" : "top-down");
       return next;
     });
   }, []);
@@ -270,13 +420,14 @@ function FamilyTree() {
   const { nodes, edges } = useMemo(() => {
     const sortedByBirth = getSortedByBirth(people);
     const personById = new Map(sortedByBirth.map((person) => [person.id, person]));
-    const generationById = getGenerationById(sortedByBirth);
+    const generationByIdForTree = getGenerationById(sortedByBirth);
     const nodeGapX = 300;
     const nodeWidth = 220;
     const nodeMinGapX = 44;
     const familyGapColumns = 0.55;
     const regularGapColumns = 0.12;
     const branchGroupGapColumns = 1.15;
+    const generationStep = isLeftToRightLayout ? 320 : 180;
 
     const childrenById = getChildrenById(sortedByBirth);
     const spousesById = new Map<string, string[]>();
@@ -288,7 +439,7 @@ function FamilyTree() {
 
     if (showTopGenerationOnly) {
       sortedByBirth.forEach((person) => {
-        if ((generationById.get(person.id) ?? 0) > 0) {
+        if ((generationByIdForTree.get(person.id) ?? 0) > 0) {
           hiddenNodeIds.add(person.id);
         }
       });
@@ -357,7 +508,7 @@ function FamilyTree() {
 
     const groupedByGeneration = new Map<number, string[]>();
     sortedByBirth.forEach((person) => {
-      const generation = generationById.get(person.id) ?? 0;
+      const generation = generationByIdForTree.get(person.id) ?? 0;
       const group = groupedByGeneration.get(generation) ?? [];
       group.push(person.id);
       groupedByGeneration.set(generation, group);
@@ -374,195 +525,203 @@ function FamilyTree() {
     [...groupedByGeneration.entries()]
       .sort((a, b) => a[0] - b[0])
       .forEach(([generation, ids]) => {
-      const generationSet = new Set(ids);
-      const placed = new Set<string>();
-      let cursor = 0;
-      let lastParentGroupKey: string | null = null;
-      let nextFreeX = 0;
+        const generationSet = new Set(ids);
+        const placed = new Set<string>();
+        let cursor = 0;
+        let lastParentGroupKey: string | null = null;
+        let nextFreeX = 0;
 
-      const orderedIds = [...ids].sort((aId, bId) => {
-        const a = personById.get(aId);
-        const b = personById.get(bId);
+        const orderedIds = [...ids].sort((aId, bId) => {
+          const a = personById.get(aId);
+          const b = personById.get(bId);
 
-        const aPrimaryParent = a?.parents?.[0];
-        const bPrimaryParent = b?.parents?.[0];
+          const aPrimaryParent = a?.parents?.[0];
+          const bPrimaryParent = b?.parents?.[0];
 
-        const aParentX = aPrimaryParent ? positionedXById.get(aPrimaryParent) : undefined;
-        const bParentX = bPrimaryParent ? positionedXById.get(bPrimaryParent) : undefined;
+          const aParentX = aPrimaryParent ? positionedXById.get(aPrimaryParent) : undefined;
+          const bParentX = bPrimaryParent ? positionedXById.get(bPrimaryParent) : undefined;
 
-        if (aParentX !== undefined && bParentX !== undefined && aParentX !== bParentX) {
-          return aParentX - bParentX;
-        }
-
-        if (aParentX !== undefined && bParentX === undefined) {
-          return -1;
-        }
-
-        if (aParentX === undefined && bParentX !== undefined) {
-          return 1;
-        }
-
-        return (fileOrderIndex.get(aId) ?? 0) - (fileOrderIndex.get(bId) ?? 0);
-      });
-
-      const siblingIdsByParent = new Map<string, string[]>();
-      orderedIds.forEach((id) => {
-        const person = personById.get(id);
-        const primaryParentId = person?.parents?.[0];
-        if (!primaryParentId || !positionedXById.has(primaryParentId)) {
-          return;
-        }
-
-        const siblings = siblingIdsByParent.get(primaryParentId) ?? [];
-        siblings.push(id);
-        siblingIdsByParent.set(primaryParentId, siblings);
-      });
-
-      const reserveVisibleX = (desiredX: number) => {
-        const x = Math.max(desiredX, nextFreeX);
-        nextFreeX = x + nodeWidth + nodeMinGapX;
-        return x;
-      };
-
-      const pushNode = (person: Person, x: number, hidden: boolean, reserveSpace: boolean) => {
-        const finalX = !hidden && reserveSpace ? reserveVisibleX(x) : x;
-        positionedXById.set(person.id, finalX);
-
-        treeNodes.push({
-          id: person.id,
-          type: "personNode",
-          position: { x: finalX, y: 180 * generation },
-          data: {
-            name: person.name,
-            chineseName: person.chineseName,
-            yearText: getNodeYearText(person),
-            canExpand: expandableIds.has(person.id),
-            collapsed: collapsedIds.has(person.id),
-            onToggle: handleToggleCollapse
-          },
-          hidden,
-          className: "tree-person-node-wrap",
-          style: {
-            width: 220,
-            padding: 0,
-            borderRadius: 16,
-            border: "1px solid #5ab8db",
-            background: "linear-gradient(160deg, #f8fbff, #e1efff)",
-            boxShadow: "0 8px 22px rgba(5, 15, 26, 0.25)"
+          if (aParentX !== undefined && bParentX !== undefined && aParentX !== bParentX) {
+            return aParentX - bParentX;
           }
+
+          if (aParentX !== undefined && bParentX === undefined) {
+            return -1;
+          }
+
+          if (aParentX === undefined && bParentX !== undefined) {
+            return 1;
+          }
+
+          return (fileOrderIndex.get(aId) ?? 0) - (fileOrderIndex.get(bId) ?? 0);
         });
-      };
 
-      const getDesiredCenterX = (person: Person): number | null => {
-        const parentXs = person.parents
-          .map((parentId) => positionedXById.get(parentId))
-          .filter((x): x is number => x !== undefined);
+        const siblingIdsByParent = new Map<string, string[]>();
+        orderedIds.forEach((id) => {
+          const person = personById.get(id);
+          const primaryParentId = person?.parents?.[0];
+          if (!primaryParentId || !positionedXById.has(primaryParentId)) {
+            return;
+          }
 
-        if (parentXs.length === 0) {
-          return null;
-        }
+          const siblings = siblingIdsByParent.get(primaryParentId) ?? [];
+          siblings.push(id);
+          siblingIdsByParent.set(primaryParentId, siblings);
+        });
 
-        const sum = parentXs.reduce((acc, x) => acc + x, 0);
-        return sum / parentXs.length;
-      };
+        const reserveVisibleX = (desiredX: number) => {
+          const x = Math.max(desiredX, nextFreeX);
+          nextFreeX = x + nodeWidth + nodeMinGapX;
+          return x;
+        };
 
-      const getDesiredChildSlotX = (person: Person): number | null => {
-        const primaryParentId = person.parents[0];
-        if (!primaryParentId) {
-          return null;
-        }
+        const pushNode = (person: Person, x: number, hidden: boolean, reserveSpace: boolean) => {
+          const finalX = !hidden && reserveSpace ? reserveVisibleX(x) : x;
+          positionedXById.set(person.id, finalX);
 
-        const parentX = positionedXById.get(primaryParentId);
-        const siblingIds = siblingIdsByParent.get(primaryParentId);
+          const generationPosition = generationStep * generation;
+          const position = isLeftToRightLayout
+            ? { x: generationPosition, y: finalX }
+            : { x: finalX, y: generationPosition };
 
-        if (parentX === undefined || !siblingIds || siblingIds.length === 0) {
-          return null;
-        }
+          treeNodes.push({
+            id: person.id,
+            type: "personNode",
+            position,
+            data: {
+              name: person.name,
+              chineseName: person.chineseName,
+              yearText: getNodeYearText(person),
+              deceased: person.deceased,
+              canExpand: expandableIds.has(person.id),
+              collapsed: collapsedIds.has(person.id),
+              onToggle: handleToggleCollapse
+            },
+            hidden,
+            className: `tree-person-node-wrap${person.deceased ? " tree-person-node-wrap--deceased" : ""}`,
+            style: {
+              width: 220,
+              padding: 0,
+              borderRadius: 16,
+              border: person.deceased ? "1px solid #8f9eb0" : "1px solid #5ab8db",
+              background: person.deceased
+                ? "linear-gradient(160deg, #f1f4f7, #d7e0ea)"
+                : "linear-gradient(160deg, #f8fbff, #e1efff)",
+              boxShadow: "0 8px 22px rgba(5, 15, 26, 0.25)"
+            }
+          });
+        };
 
-        const index = siblingIds.indexOf(person.id);
-        if (index < 0) {
-          return null;
-        }
+        const getDesiredCenterX = (person: Person): number | null => {
+          const parentXs = person.parents
+            .map((parentId) => positionedXById.get(parentId))
+            .filter((x): x is number => x !== undefined);
 
-        const offset = index - (siblingIds.length - 1) / 2;
-        return parentX + offset * nodeGapX * 0.9;
-      };
+          if (parentXs.length === 0) {
+            return null;
+          }
 
-      orderedIds.forEach((id) => {
-        if (placed.has(id)) {
-          return;
-        }
+          const sum = parentXs.reduce((acc, x) => acc + x, 0);
+          return sum / parentXs.length;
+        };
 
-        const person = personById.get(id);
-        if (!person) {
-          return;
-        }
+        const getDesiredChildSlotX = (person: Person): number | null => {
+          const primaryParentId = person.parents[0];
+          if (!primaryParentId) {
+            return null;
+          }
 
-        const parentGroupKey = person.parents[0] ?? `root:${person.id}`;
-        const personHidden = hiddenNodeIds.has(person.id);
+          const parentX = positionedXById.get(primaryParentId);
+          const siblingIds = siblingIdsByParent.get(primaryParentId);
 
-        if (!personHidden && lastParentGroupKey !== null && parentGroupKey !== lastParentGroupKey) {
-          const rowBranchGap = generation === 0 ? branchGroupGapColumns : 0.25;
-          cursor += rowBranchGap;
-        }
+          if (parentX === undefined || !siblingIds || siblingIds.length === 0) {
+            return null;
+          }
 
-        const spouseId = person.spouses.find((spouse) => generationSet.has(spouse) && !placed.has(spouse));
-        const spouse = spouseId ? personById.get(spouseId) : undefined;
-        const spouseHidden = spouse ? hiddenNodeIds.has(spouse.id) : true;
+          const index = siblingIds.indexOf(person.id);
+          if (index < 0) {
+            return null;
+          }
 
-        const hasVisiblePrimaryChildren = (primaryChildrenById.get(person.id) ?? []).some(
-          (childId) => !hiddenNodeIds.has(childId)
-        );
+          const offset = index - (siblingIds.length - 1) / 2;
+          return parentX + offset * nodeGapX * 0.9;
+        };
 
-        if (!personHidden && spouse && !spouseHidden) {
-          // Keep couples adjacent, then reserve extra columns for descendant branches.
-          const personDesired = getDesiredChildSlotX(person) ?? getDesiredCenterX(person);
-          const spouseDesired = getDesiredChildSlotX(spouse) ?? getDesiredCenterX(spouse);
-          const desiredCenter = personDesired ?? spouseDesired ?? null;
-          const minLeftX = cursor * nodeGapX;
-          const leftX = Math.max(minLeftX, desiredCenter !== null ? desiredCenter - nodeGapX / 2 : minLeftX);
+        orderedIds.forEach((id) => {
+          if (placed.has(id)) {
+            return;
+          }
 
-          const placedLeftX = reserveVisibleX(leftX);
-          pushNode(person, placedLeftX, false, false);
-          pushNode(spouse, placedLeftX + nodeGapX, false, true);
+          const person = personById.get(id);
+          if (!person) {
+            return;
+          }
 
-          const personSpan = Math.max(1, getVisibleBranchSpan(person.id));
-          const reservedColumns = Math.max(2, personSpan);
-          const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
+          const parentGroupKey = person.parents[0] ?? `root:${person.id}`;
+          const personHidden = hiddenNodeIds.has(person.id);
 
-          cursor = Math.max(cursor, placedLeftX / nodeGapX + reservedColumns + gapAfter);
-          lastParentGroupKey = parentGroupKey;
+          if (!personHidden && lastParentGroupKey !== null && parentGroupKey !== lastParentGroupKey) {
+            const rowBranchGap = generation === 0 ? branchGroupGapColumns : 0.25;
+            cursor += rowBranchGap;
+          }
+
+          const spouseId = person.spouses.find((spouse) => generationSet.has(spouse) && !placed.has(spouse));
+          const spouse = spouseId ? personById.get(spouseId) : undefined;
+          const spouseHidden = spouse ? hiddenNodeIds.has(spouse.id) : true;
+
+          const hasVisiblePrimaryChildren = (primaryChildrenById.get(person.id) ?? []).some(
+            (childId) => !hiddenNodeIds.has(childId)
+          );
+
+          if (!personHidden && spouse && !spouseHidden) {
+            // Keep couples adjacent, then reserve extra columns for descendant branches.
+            const personDesired = getDesiredChildSlotX(person) ?? getDesiredCenterX(person);
+            const spouseDesired = getDesiredChildSlotX(spouse) ?? getDesiredCenterX(spouse);
+            const desiredCenter = personDesired ?? spouseDesired ?? null;
+            const minLeftX = cursor * nodeGapX;
+            const leftX = Math.max(minLeftX, desiredCenter !== null ? desiredCenter - nodeGapX / 2 : minLeftX);
+
+            const placedLeftX = reserveVisibleX(leftX);
+            pushNode(person, placedLeftX, false, false);
+            pushNode(spouse, placedLeftX + nodeGapX, false, true);
+
+            const personSpan = Math.max(1, getVisibleBranchSpan(person.id));
+            const reservedColumns = Math.max(2, personSpan);
+            const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
+
+            cursor = Math.max(cursor, placedLeftX / nodeGapX + reservedColumns + gapAfter);
+            lastParentGroupKey = parentGroupKey;
+            placed.add(person.id);
+            placed.add(spouse.id);
+            return;
+          }
+
+          const span = personHidden ? 0 : Math.max(1, getVisibleBranchSpan(person.id));
+          const minCenterX = (cursor + (span - 1) / 2) * nodeGapX;
+          const desiredCenterX = getDesiredChildSlotX(person) ?? getDesiredCenterX(person);
+          const x = personHidden
+            ? 0
+            : generation === 0
+              ? Math.max(minCenterX, desiredCenterX ?? minCenterX)
+              : (desiredCenterX ?? minCenterX);
+          pushNode(person, x, personHidden, true);
+
+          if (!personHidden) {
+            const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
+            const placedX = positionedXById.get(person.id) ?? x;
+            const leftCol = placedX / nodeGapX - (span - 1) / 2;
+            cursor = Math.max(cursor, leftCol + span + gapAfter);
+            lastParentGroupKey = parentGroupKey;
+          }
+
+          if (spouse) {
+            pushNode(spouse, 0, spouseHidden, false);
+            placed.add(spouse.id);
+          }
+
           placed.add(person.id);
-          placed.add(spouse.id);
-          return;
-        }
-
-        const span = personHidden ? 0 : Math.max(1, getVisibleBranchSpan(person.id));
-        const minCenterX = (cursor + (span - 1) / 2) * nodeGapX;
-        const desiredCenterX = getDesiredChildSlotX(person) ?? getDesiredCenterX(person);
-        const x = personHidden
-          ? 0
-          : generation === 0
-            ? Math.max(minCenterX, desiredCenterX ?? minCenterX)
-            : (desiredCenterX ?? minCenterX);
-        pushNode(person, x, personHidden, true);
-
-        if (!personHidden) {
-          const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
-          const placedX = positionedXById.get(person.id) ?? x;
-          const leftCol = placedX / nodeGapX - (span - 1) / 2;
-          cursor = Math.max(cursor, leftCol + span + gapAfter);
-          lastParentGroupKey = parentGroupKey;
-        }
-
-        if (spouse) {
-          pushNode(spouse, 0, spouseHidden, false);
-          placed.add(spouse.id);
-        }
-
-        placed.add(person.id);
+        });
       });
-    });
 
     const treeEdges: Edge[] = [];
 
@@ -580,9 +739,9 @@ function FamilyTree() {
         treeEdges.push({
           id: `${person.id}-${childId}`,
           source: person.id,
-          sourceHandle: "bottom",
+          sourceHandle: isLeftToRightLayout ? "right" : "bottom",
           target: childId,
-          targetHandle: "top",
+          targetHandle: isLeftToRightLayout ? "left" : "top",
           type: "step",
           className: "parent-link",
           hidden: hiddenNodeIds.has(person.id) || hiddenNodeIds.has(childId),
@@ -597,9 +756,9 @@ function FamilyTree() {
           treeEdges.push({
             id: `spouse-${person.id}-${spouseId}`,
             source: person.id,
-            sourceHandle: "right",
+            sourceHandle: isLeftToRightLayout ? "bottom" : "right",
             target: spouseId,
-            targetHandle: "left",
+            targetHandle: isLeftToRightLayout ? "top" : "left",
             className: "spouse-link",
             hidden: hiddenNodeIds.has(person.id) || hiddenNodeIds.has(spouseId),
             type: "straight",
@@ -611,15 +770,17 @@ function FamilyTree() {
     });
 
     return { nodes: treeNodes, edges: treeEdges };
-  }, [people, collapsedIds, handleToggleCollapse, showTopGenerationOnly, expandableIds]);
+  }, [people, collapsedIds, handleToggleCollapse, showTopGenerationOnly, expandableIds, isLeftToRightLayout]);
 
   const handleExpandAll = useCallback(() => {
     setShowTopGenerationOnly(false);
+    setIsExpandAllMode(true);
     setCollapsedIds(new Set());
   }, []);
 
   const handleCollapseAll = useCallback(() => {
     setShowTopGenerationOnly(false);
+    setIsExpandAllMode(false);
     setCollapsedIds(new Set(defaultCollapsedIds));
   }, [defaultCollapsedIds]);
 
@@ -632,6 +793,8 @@ function FamilyTree() {
 
   const handleFlowInit = useCallback(
     (instance: ReactFlowInstance) => {
+      reactFlowRef.current = instance;
+
       if (hasCenteredInitiallyRef.current) {
         return;
       }
@@ -641,19 +804,45 @@ function FamilyTree() {
         return;
       }
 
-      const visibleRows = [...new Set(visibleNodes.map((node) => node.position.y))].sort((a, b) => a - b);
-      const targetRowY = visibleRows[1] ?? visibleRows[0];
-      const targetRowNodes = visibleNodes.filter((node) => node.position.y === targetRowY);
+      if (!isLeftToRightLayout) {
+        // Desktop default: fit view to generation levels 0-2 ("level 3").
+        const level3Nodes = visibleNodes.filter((node) => (generationById.get(node.id) ?? Number.MAX_SAFE_INTEGER) <= 2);
+        const targetNodes = level3Nodes.length > 0 ? level3Nodes : visibleNodes;
 
-      const rowMinX = Math.min(...targetRowNodes.map((node) => node.position.x));
-      const rowMaxX = Math.max(...targetRowNodes.map((node) => node.position.x));
-      const targetX = (rowMinX + rowMaxX) / 2 + 110;
-      const targetY = targetRowY + 46;
+        instance.fitView({
+          nodes: targetNodes.map((node) => ({ id: node.id })),
+          duration: 250,
+          padding: 0.2,
+          minZoom: MIN_TREE_ZOOM
+        });
 
-      instance.setCenter(targetX, targetY, { duration: 250, zoom: 1 });
+        hasCenteredInitiallyRef.current = true;
+        return;
+      }
+
+      const groupingAxisValues = isLeftToRightLayout
+        ? [...new Set(visibleNodes.map((node) => node.position.x))].sort((a, b) => a - b)
+        : [...new Set(visibleNodes.map((node) => node.position.y))].sort((a, b) => a - b);
+
+      const targetAxisValue = groupingAxisValues[1] ?? groupingAxisValues[0];
+      const targetBandNodes = visibleNodes.filter((node) =>
+        isLeftToRightLayout ? node.position.x === targetAxisValue : node.position.y === targetAxisValue
+      );
+
+      const bandMin = Math.min(
+        ...targetBandNodes.map((node) => (isLeftToRightLayout ? node.position.y : node.position.x))
+      );
+      const bandMax = Math.max(
+        ...targetBandNodes.map((node) => (isLeftToRightLayout ? node.position.y : node.position.x))
+      );
+
+      const targetX = isLeftToRightLayout ? targetAxisValue + 110 : (bandMin + bandMax) / 2 + 110;
+      const targetY = isLeftToRightLayout ? (bandMin + bandMax) / 2 + 46 : targetAxisValue + 46;
+
+      instance.setCenter(targetX, targetY, { duration: 250, zoom: MIN_TREE_ZOOM });
       hasCenteredInitiallyRef.current = true;
     },
-    [nodes]
+    [nodes, isLeftToRightLayout, generationById]
   );
 
   return (
@@ -666,10 +855,13 @@ function FamilyTree() {
           </div>
           <div className="tree-actions">
             <button type="button" className="tree-action-btn" onClick={handleExpandAll}>
-              Open all
+              Expand all
             </button>
             <button type="button" className="tree-action-btn" onClick={handleCollapseAll}>
               Collapse all
+            </button>
+            <button type="button" className="tree-action-btn" onClick={handleToggleLayout}>
+              Layout: {isLeftToRightLayout ? "Left/Right" : "Top/Down"}
             </button>
           </div>
         </div>
@@ -678,6 +870,7 @@ function FamilyTree() {
       <div className="tree-canvas">
         <ReactFlow
           fitView
+          minZoom={MIN_TREE_ZOOM}
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
@@ -708,10 +901,10 @@ function FamilyTree() {
       <div className="card-grid">
         {filteredPeople.map((person) => (
           <Link key={person.id} to={`/person/${person.id}`} className="person-card-link">
-            <article className="person-card">
+            <article className={`person-card${person.deceased ? " person-card--deceased" : ""}`}>
               <h3>{person.name}</h3>
               {person.chineseName && <p className="person-card__chinese">{person.chineseName}</p>}
-              <p>{getCardYearText(person)}</p>
+              <p className="person-card__year">{getCardYearText(person)}</p>
             </article>
           </Link>
         ))}
