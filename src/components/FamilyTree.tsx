@@ -45,8 +45,9 @@ function PersonNode({ id, data }: NodeProps) {
             personData.onToggle(id);
           }}
           title={personData.collapsed ? "Expand descendants" : "Collapse descendants"}
+          aria-label={personData.collapsed ? "Expand descendants" : "Collapse descendants"}
         >
-          {personData.collapsed ? "+" : "-"}
+          {personData.collapsed ? "▸" : "▾"}
         </button>
       )}
     </div>
