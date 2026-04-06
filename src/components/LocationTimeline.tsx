@@ -11,7 +11,7 @@ function LocationTimeline({ locations }: LocationTimelineProps) {
     <ul className="timeline-list">
       {sortedLocations.map((location, index) => (
         <li key={`${location.place}-${index}`}>
-          <strong>{location.year ?? "Unknown"}</strong> - {location.place} ({location.type})
+          <strong>{location.year ?? "Unknown"}</strong> - <span className="multiline-text">{location.place}</span> ({location.type})
         </li>
       ))}
     </ul>

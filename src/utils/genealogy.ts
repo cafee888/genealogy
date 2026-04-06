@@ -2,7 +2,34 @@ import peopleData from "../data/people.json";
 import photosData from "../data/photos.json";
 import type { Person, Photo } from "../types";
 
-const people = peopleData as Person[];
+function normalizePerson(raw: Partial<Person> & { id: string; name: string }): Person {
+  return {
+    id: raw.id,
+    name: raw.name,
+    chineseName: raw.chineseName ?? null,
+    birth: {
+      date: raw.birth?.date ?? null,
+      year: raw.birth?.year ?? null,
+      place: raw.birth?.place ?? null
+    },
+    death: {
+      date: raw.death?.date ?? null,
+      year: raw.death?.year ?? null,
+      place: raw.death?.place ?? null
+    },
+    parents: raw.parents ?? [],
+    spouses: raw.spouses ?? [],
+    children: raw.children ?? [],
+    locations: raw.locations ?? [],
+    burial: {
+      place: raw.burial?.place ?? null,
+      notes: raw.burial?.notes ?? null
+    },
+    bio: raw.bio ?? ""
+  };
+}
+
+const people = (peopleData as Array<Partial<Person> & { id: string; name: string }>).map(normalizePerson);
 const photos = photosData as Photo[];
 const peopleById = new Map(people.map((person) => [person.id, person]));
 

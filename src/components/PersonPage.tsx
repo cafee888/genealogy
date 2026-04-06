@@ -2,10 +2,72 @@ import { Link, useParams } from "react-router-dom";
 import LocationTimeline from "./LocationTimeline";
 import PhotoGallery from "./PhotoGallery";
 import { getPersonById, getPhotosForPerson, getRelatives } from "../utils/genealogy";
+import type { Person } from "../types";
 
 function formatLifeEvent(event: { date?: string | null; year: number | null; place: string | null }, fallback: string) {
   const dateOrYear = event.date ?? event.year ?? fallback;
   return `${dateOrYear}${event.place ? `, ${event.place}` : ""}`;
+}
+
+function extractYear(dateOrNull: string | null | undefined, yearOrNull: number | null): number | null {
+  if (yearOrNull !== null) {
+    return yearOrNull;
+  }
+
+  if (!dateOrNull) {
+    return null;
+  }
+
+  const match = dateOrNull.match(/(\d{4})/);
+  return match ? Number(match[1]) : null;
+}
+
+function parseDateLoose(dateOrNull: string | null | undefined): Date | null {
+  if (!dateOrNull) {
+    return null;
+  }
+
+  const iso = dateOrNull.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) {
+    const date = new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const dmy = dateOrNull.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (dmy) {
+    const date = new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  return null;
+}
+
+function calculateAgeAtDeath(person: Person): number | null {
+  const birthYear = extractYear(person.birth.date, person.birth.year);
+  const deathYear = extractYear(person.death.date, person.death.year);
+
+  if (birthYear === null || deathYear === null) {
+    return null;
+  }
+
+  const birthDate = parseDateLoose(person.birth.date);
+  const deathDate = parseDateLoose(person.death.date);
+
+  if (birthDate && deathDate) {
+    let age = deathDate.getFullYear() - birthDate.getFullYear();
+    const beforeBirthday =
+      deathDate.getMonth() < birthDate.getMonth() ||
+      (deathDate.getMonth() === birthDate.getMonth() && deathDate.getDate() < birthDate.getDate());
+
+    if (beforeBirthday) {
+      age -= 1;
+    }
+
+    return age >= 0 ? age : null;
+  }
+
+  const yearAge = deathYear - birthYear;
+  return yearAge >= 0 ? yearAge : null;
 }
 
 function PersonPage() {
@@ -24,6 +86,7 @@ function PersonPage() {
   const relatives = getRelatives(person.id);
   const photos = getPhotosForPerson(person.id);
   const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
+  const ageAtDeath = calculateAgeAtDeath(person);
 
   return (
     <article className="panel person-layout">
@@ -45,16 +108,21 @@ function PersonPage() {
           </p>
         )}
         <p>
-          <strong>Birth:</strong> {formatLifeEvent(person.birth, "Unknown")}
+          <strong>Birth:</strong> <span className="multiline-text">{formatLifeEvent(person.birth, "Unknown")}</span>
         </p>
         {hasDeathInfo && (
           <p>
-            <strong>Death:</strong> {formatLifeEvent(person.death, "Unknown")}
+            <strong>Death:</strong> <span className="multiline-text">{formatLifeEvent(person.death, "Unknown")}</span>
+          </p>
+        )}
+        {hasDeathInfo && ageAtDeath !== null && (
+          <p>
+            <strong>Age at death:</strong> {ageAtDeath}
           </p>
         )}
         {(person.burial.place || person.burial.notes) && (
           <p>
-            <strong>Burial:</strong> {person.burial.place ?? "Unknown"}
+            <strong>Burial:</strong> <span className="multiline-text">{person.burial.place ?? "Unknown"}</span>
             {person.burial.notes ? ` (${person.burial.notes})` : ""}
           </p>
         )}
@@ -62,7 +130,7 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Bio</h3>
-        <p>{person.bio}</p>
+        <p className="multiline-text">{person.bio}</p>
       </section>
 
       <section className="profile-section relatives-list">

@@ -370,6 +370,10 @@ body::before {
   color: #d4e8f8;
 }
 
+.multiline-text {
+  white-space: pre-line;
+}
+
 .relatives-list p {
   display: flex;
   flex-wrap: wrap;

@@ -18,7 +18,7 @@ import type { Person } from "../types";
 interface PersonNodeData {
   name: string;
   chineseName: string | null;
-  year: number | "?";
+  yearText: string | null;
   canExpand: boolean;
   collapsed: boolean;
   onToggle: (id: string) => void;
@@ -35,7 +35,7 @@ function PersonNode({ id, data }: NodeProps) {
       <Handle type="source" position={Position.Right} id="right" className="tree-handle" />
       <div className="tree-person-node__name">{personData.name}</div>
       {personData.chineseName && <div className="tree-person-node__chinese">{personData.chineseName}</div>}
-      <div className="tree-person-node__year">{personData.year}</div>
+      {personData.yearText && <div className="tree-person-node__year">{personData.yearText}</div>}
       {personData.canExpand && (
         <button
           type="button"
@@ -118,6 +118,53 @@ function getGenerationById(sortedByBirth: Person[]): Map<string, number> {
   return generationById;
 }
 
+function getChildrenById(people: Person[]): Map<string, string[]> {
+  const map = new Map<string, Set<string>>();
+
+  people.forEach((person) => {
+    map.set(person.id, new Set(person.children));
+  });
+
+  people.forEach((child) => {
+    child.parents.forEach((parentId) => {
+      const parentChildren = map.get(parentId) ?? new Set<string>();
+      parentChildren.add(child.id);
+      map.set(parentId, parentChildren);
+    });
+  });
+
+  const normalized = new Map<string, string[]>();
+  map.forEach((children, parentId) => {
+    normalized.set(parentId, [...children]);
+  });
+
+  return normalized;
+}
+
+function extractYear(dateOrNull: string | null | undefined, yearOrNull: number | null): number | null {
+  if (yearOrNull !== null) {
+    return yearOrNull;
+  }
+
+  if (!dateOrNull) {
+    return null;
+  }
+
+  const match = dateOrNull.match(/(\d{4})/);
+  return match ? Number(match[1]) : null;
+}
+
+function getNodeYearText(person: Person): string {
+  const birthYear = extractYear(person.birth.date, person.birth.year);
+  const deathYear = extractYear(person.death.date, person.death.year);
+
+  if (birthYear === null) {
+    return "";
+  }
+
+  return `${birthYear} - ${deathYear ?? "Unknown"}`;
+}
+
 function getDefaultCollapsedIds(people: Person[]): Set<string> {
   const sortedByBirth = getSortedByBirth(people);
   const generationById = getGenerationById(sortedByBirth);
@@ -138,10 +185,13 @@ function getDefaultCollapsedIds(people: Person[]): Set<string> {
 
 function getExpandableIds(people: Person[]): Set<string> {
   const personById = new Map(people.map((person) => [person.id, person]));
+  const childrenById = getChildrenById(people);
   const expandable = new Set<string>();
 
   people.forEach((person) => {
-    const hasExpandableChild = person.children.some((childId) => {
+    const childIds = childrenById.get(person.id) ?? [];
+
+    const hasExpandableChild = childIds.some((childId) => {
       const child = personById.get(childId);
       if (!child || child.parents.length === 0) {
         return true;
@@ -191,10 +241,9 @@ function FamilyTree() {
     const personById = new Map(sortedByBirth.map((person) => [person.id, person]));
     const generationById = getGenerationById(sortedByBirth);
 
-    const childrenById = new Map<string, string[]>();
+    const childrenById = getChildrenById(sortedByBirth);
     const spousesById = new Map<string, string[]>();
     sortedByBirth.forEach((person) => {
-      childrenById.set(person.id, person.children);
       spousesById.set(person.id, person.spouses);
     });
 
@@ -255,7 +304,7 @@ function FamilyTree() {
           data: {
             name: person.name,
             chineseName: person.chineseName,
-            year: person.birth.year ?? "?",
+            yearText: getNodeYearText(person),
             canExpand: expandableIds.has(person.id),
             collapsed: collapsedIds.has(person.id),
             onToggle: handleToggleCollapse
@@ -277,7 +326,9 @@ function FamilyTree() {
     const treeEdges: Edge[] = [];
 
     people.forEach((person) => {
-      person.children.forEach((childId) => {
+      const childIds = childrenById.get(person.id) ?? [];
+
+      childIds.forEach((childId) => {
         const child = personById.get(childId);
         const isPrimaryParent = !child || child.parents.length === 0 || child.parents[0] === person.id;
 
@@ -291,6 +342,7 @@ function FamilyTree() {
           sourceHandle: "bottom",
           target: childId,
           targetHandle: "top",
+          type: "step",
           className: "parent-link",
           hidden: hiddenNodeIds.has(person.id) || hiddenNodeIds.has(childId),
           markerEnd: { type: MarkerType.ArrowClosed, color: "#5dd6ff" },
