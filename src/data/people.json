@@ -4,10 +4,12 @@
     "name": "Lim Wen Fu",
     "chineseName": "林文福",
     "birth": {
+      "date": "1912-03-18",
       "year": 1912,
       "place": "Fujian, China"
     },
     "death": {
+      "date": "1984-11-02",
       "year": 1984,
       "place": "Sitiawan, Perak, Malaysia"
     },
@@ -42,10 +44,12 @@
     "name": "Lee Soon Neo",
     "chineseName": "李顺娘",
     "birth": {
+      "date": null,
       "year": 1918,
       "place": "Ipoh, Perak, Malaysia"
     },
     "death": {
+      "date": null,
       "year": 1992,
       "place": "Sitiawan, Perak, Malaysia"
     },
@@ -75,10 +79,12 @@
     "name": "Lim Cheng Huat",
     "chineseName": "林清发",
     "birth": {
+      "date": "1948-07-12",
       "year": 1948,
       "place": "Sitiawan, Perak, Malaysia"
     },
     "death": {
+      "date": null,
       "year": null,
       "place": null
     },
@@ -113,10 +119,12 @@
     "name": "Ng Yoke Lin",
     "chineseName": "黄玉莲",
     "birth": {
+      "date": "1950-02-04",
       "year": 1950,
       "place": "Klang, Selangor, Malaysia"
     },
     "death": {
+      "date": null,
       "year": null,
       "place": null
     },
@@ -146,10 +154,12 @@
     "name": "Lim Mei Yan",
     "chineseName": "林美燕",
     "birth": {
+      "date": null,
       "year": 1978,
       "place": "Kuala Lumpur, Malaysia"
     },
     "death": {
+      "date": null,
       "year": null,
       "place": null
     },
@@ -184,10 +194,12 @@
     "name": "Lim Jian Wei",
     "chineseName": "林建伟",
     "birth": {
+      "date": "1982-10-21",
       "year": 1982,
       "place": "Petaling Jaya, Malaysia"
     },
     "death": {
+      "date": null,
       "year": null,
       "place": null
     },
@@ -222,10 +234,12 @@
     "name": "Tan Lucas Hao",
     "chineseName": "陈昊宇",
     "birth": {
+      "date": "2010-06-15",
       "year": 2010,
       "place": "George Town, Penang, Malaysia"
     },
     "death": {
+      "date": null,
       "year": null,
       "place": null
     },

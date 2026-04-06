@@ -3,6 +3,11 @@ import LocationTimeline from "./LocationTimeline";
 import PhotoGallery from "./PhotoGallery";
 import { getPersonById, getPhotosForPerson, getRelatives } from "../utils/genealogy";
 
+function formatLifeEvent(event: { date?: string | null; year: number | null; place: string | null }, fallback: string) {
+  const dateOrYear = event.date ?? event.year ?? fallback;
+  return `${dateOrYear}${event.place ? `, ${event.place}` : ""}`;
+}
+
 function PersonPage() {
   const { personId } = useParams();
 
@@ -18,6 +23,7 @@ function PersonPage() {
 
   const relatives = getRelatives(person.id);
   const photos = getPhotosForPerson(person.id);
+  const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
 
   return (
     <article className="panel person-layout">
@@ -39,11 +45,13 @@ function PersonPage() {
           </p>
         )}
         <p>
-          <strong>Birth:</strong> {person.birth.year ?? "Unknown"} {person.birth.place ? `, ${person.birth.place}` : ""}
+          <strong>Birth:</strong> {formatLifeEvent(person.birth, "Unknown")}
         </p>
-        <p>
-          <strong>Death:</strong> {person.death.year ?? "Alive"} {person.death.place ? `, ${person.death.place}` : ""}
-        </p>
+        {hasDeathInfo && (
+          <p>
+            <strong>Death:</strong> {formatLifeEvent(person.death, "Unknown")}
+          </p>
+        )}
         {(person.burial.place || person.burial.notes) && (
           <p>
             <strong>Burial:</strong> {person.burial.place ?? "Unknown"}

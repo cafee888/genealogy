@@ -192,8 +192,10 @@ function FamilyTree() {
     const generationById = getGenerationById(sortedByBirth);
 
     const childrenById = new Map<string, string[]>();
+    const spousesById = new Map<string, string[]>();
     sortedByBirth.forEach((person) => {
       childrenById.set(person.id, person.children);
+      spousesById.set(person.id, person.spouses);
     });
 
     const hiddenNodeIds = new Set<string>();
@@ -208,13 +210,22 @@ function FamilyTree() {
       collapsedIds.forEach((collapsedId) => {
         const stack = [...(childrenById.get(collapsedId) ?? [])];
         while (stack.length > 0) {
-          const descendantId = stack.pop();
-          if (!descendantId || hiddenNodeIds.has(descendantId)) {
+          const branchPersonId = stack.pop();
+          if (!branchPersonId || hiddenNodeIds.has(branchPersonId)) {
             continue;
           }
 
-          hiddenNodeIds.add(descendantId);
-          const descendantChildren = childrenById.get(descendantId) ?? [];
+          hiddenNodeIds.add(branchPersonId);
+
+          // Keep a collapsed branch coherent by hiding spouses tied to hidden descendants.
+          const spouseIds = spousesById.get(branchPersonId) ?? [];
+          spouseIds.forEach((spouseId) => {
+            if (!hiddenNodeIds.has(spouseId)) {
+              stack.push(spouseId);
+            }
+          });
+
+          const descendantChildren = childrenById.get(branchPersonId) ?? [];
           descendantChildren.forEach((childId) => stack.push(childId));
         }
       });

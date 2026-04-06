@@ -11,10 +11,12 @@ export interface Person {
   name: string;
   chineseName: string | null;
   birth: {
+    date?: string | null;
     year: number | null;
     place: string | null;
   };
   death: {
+    date?: string | null;
     year: number | null;
     place: string | null;
   };
