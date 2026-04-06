@@ -641,12 +641,14 @@ function FamilyTree() {
         return;
       }
 
-      const minY = Math.min(...visibleNodes.map((node) => node.position.y));
-      const topNodes = visibleNodes.filter((node) => node.position.y === minY);
+      const visibleRows = [...new Set(visibleNodes.map((node) => node.position.y))].sort((a, b) => a - b);
+      const targetRowY = visibleRows[1] ?? visibleRows[0];
+      const targetRowNodes = visibleNodes.filter((node) => node.position.y === targetRowY);
 
-      const targetNode = [...topNodes].sort((a, b) => a.position.x - b.position.x)[0];
-      const targetX = targetNode.position.x + 110;
-      const targetY = targetNode.position.y + 46;
+      const rowMinX = Math.min(...targetRowNodes.map((node) => node.position.x));
+      const rowMaxX = Math.max(...targetRowNodes.map((node) => node.position.x));
+      const targetX = (rowMinX + rowMaxX) / 2 + 110;
+      const targetY = targetRowY + 46;
 
       instance.setCenter(targetX, targetY, { duration: 250, zoom: 1 });
       hasCenteredInitiallyRef.current = true;
