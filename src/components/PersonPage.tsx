@@ -185,7 +185,7 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Photo Gallery</h3>
-        <PhotoGallery photos={photos} />
+        <PhotoGallery photos={photos} personId={person.id} />
       </section>
     </article>
   );

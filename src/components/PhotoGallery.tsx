@@ -3,9 +3,10 @@ import type { Photo } from "../types";
 
 interface PhotoGalleryProps {
   photos: Photo[];
+  personId: string;
 }
 
-function PhotoGallery({ photos }: PhotoGalleryProps) {
+function PhotoGallery({ photos, personId }: PhotoGalleryProps) {
   if (photos.length === 0) {
     return <p>No photos tagged for this person yet.</p>;
   }
@@ -13,7 +14,12 @@ function PhotoGallery({ photos }: PhotoGalleryProps) {
   return (
     <div className="gallery-grid">
       {photos.map((photo) => (
-        <Link key={photo.id} to={`/photo/${photo.id}`} className="photo-card-link">
+        <Link
+          key={photo.id}
+          to={`/photo/${photo.id}`}
+          state={{ fromPersonId: personId }}
+          className="photo-card-link"
+        >
           <article className="photo-card">
             <img src={photo.url} alt={photo.caption} loading="lazy" />
             <div>

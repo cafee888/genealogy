@@ -446,7 +446,8 @@ body::before {
 .photo-card img {
   width: 100%;
   height: 170px;
-  object-fit: cover;
+  object-fit: contain;
+  background: rgba(7, 18, 28, 0.9);
   display: block;
   transition: transform 320ms ease, filter 320ms ease;
 }
@@ -474,13 +475,55 @@ body::before {
   margin: 0 auto;
 }
 
+.photo-view-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.photo-zoom-btn {
+  border: 1px solid rgba(121, 192, 230, 0.55);
+  background: linear-gradient(145deg, rgba(20, 47, 68, 0.95), rgba(10, 29, 45, 0.95));
+  color: #d6eeff;
+  border-radius: 9px;
+  padding: 6px 10px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.photo-zoom-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.photo-zoom-level {
+  min-width: 44px;
+  text-align: center;
+  color: #cbe8fc;
+  font-weight: 700;
+}
+
+.photo-zoom-frame {
+  margin-top: 12px;
+  border-radius: 16px;
+  background: rgba(7, 18, 28, 0.9);
+  border: 1px solid rgba(124, 189, 223, 0.35);
+  max-height: 72vh;
+  overflow: auto;
+}
+
 .photo-large {
   width: 100%;
   border-radius: 16px;
-  margin-top: 12px;
-  max-height: 560px;
-  object-fit: cover;
+  margin-top: 0;
+  max-height: none;
+  object-fit: contain;
+  background: transparent;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.36);
+  transition: transform 180ms ease;
 }
 
 .caption {
