@@ -166,10 +166,13 @@ function PersonPage() {
         <p>
           <strong>Children:</strong>{" "}
           {relatives.children.length > 0
-            ? relatives.children.map((child) => (
-                <Link key={child.id} to={`/person/${child.id}`} className="text-link">
-                  {child.name}
-                </Link>
+            ? relatives.children.map((child, index) => (
+                <span key={child.id}>
+                  <Link to={`/person/${child.id}`} className="text-link">
+                    {child.name}
+                  </Link>
+                  {index < relatives.children.length - 1 ? ", " : ""}
+                </span>
               ))
             : "None listed"}
         </p>

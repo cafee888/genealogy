@@ -23,9 +23,8 @@
     "parents": ["ancestor-china"],
     "spouses": ["tham-yoke-keng"],
     "children": [
-      "shea-poh-sum","shea-yoke-ling"
+      "shea-poh-sum","shea-yoke-ling","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam"
     ],
-
     "bio":"Woon Mun migrated to Malaya in the early 1910s, and returned to China a few times. \n When the China closed its borders, he could not return to Malaya. Woon Mun then moved to Tianjin, China for work. \n He returned to Malaya in 1958. \nWoon Mun was the younger twin brother of Keng Yat."
   },
     {
@@ -43,6 +42,9 @@
       "place": "Kepong, Kuala Lumpur, Malaysia"
     },
     "spouses": ["shea-woon-mun"],
+        "children": [
+      "shea-poh-sum","shea-yoke-ling","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam"
+    ],
     "bio": "Yoke Keng was born in Hawaii, USA. \n She married Woon Mun in ZhongShan China and migrated to Malaya with him. \n Yoke Keng was known for her strong support of the family."
   },
   {
@@ -176,7 +178,7 @@
         "year": 1998
       }
     ],
-    "bio": "Wai Leong is the eldest son of Weng Cheong. He was born in Petaling Jaya, Selangor, Malaysia, and later moved to Winnipeg, Manitoba, Canada for studies. He returned to Malaysia in 1996 and currently lives in Shah Alam, Selangor. He also maintains the genealogy records for the family."
+    "bio": "Wai Leong is the eldest son of Weng Cheong. He was born in Petaling Jaya, Selangor, Malaysia, and later moved to Winnipeg, Manitoba, Canada for studies. \n\nHe returned to Malaysia in 1996 and currently lives in Shah Alam, Selangor. \n\n He also maintains the genealogy records for the family."
   },
   {
     "id":"shea-wan-hoe",

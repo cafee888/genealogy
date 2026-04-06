@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Background,
@@ -7,6 +7,7 @@ import {
   MarkerType,
   Position,
   ReactFlow,
+  type ReactFlowInstance,
   type NodeProps,
   type Edge,
   type Node
@@ -168,22 +169,20 @@ function getNodeYearText(person: Person): string {
   return `${birthYear} - ${deathYear ?? "Unknown"}`;
 }
 
-function getDefaultCollapsedIds(people: Person[]): Set<string> {
-  const sortedByBirth = getSortedByBirth(people);
-  const generationById = getGenerationById(sortedByBirth);
-  const expandableIds = getExpandableIds(people);
-  const defaults = new Set<string>();
+function getCardYearText(person: Person): string {
+  const birthYear = extractYear(person.birth.date, person.birth.year);
+  const deathYear = extractYear(person.death.date, person.death.year);
+  const hasDeathInfo = Boolean(person.death.date || person.death.year || person.death.place);
 
-  sortedByBirth.forEach((person) => {
-    const generation = generationById.get(person.id) ?? 0;
+  if (!hasDeathInfo) {
+    return `${birthYear ?? "Unknown"}`;
+  }
 
-    // Keep generation 0, 1, and 2 visible by default; collapse deeper descendants.
-    if (generation === 2 && expandableIds.has(person.id)) {
-      defaults.add(person.id);
-    }
-  });
+  if (deathYear !== null) {
+    return `${birthYear ?? "Unknown"} - ${deathYear}`;
+  }
 
-  return defaults;
+  return `${birthYear ?? "Unknown"} - Deceased`;
 }
 
 function getExpandableIds(people: Person[]): Set<string> {
@@ -215,9 +214,24 @@ function getExpandableIds(people: Person[]): Set<string> {
 function FamilyTree() {
   const people = getAllPeople();
   const navigate = useNavigate();
-  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => getDefaultCollapsedIds(people));
+  const hasCenteredInitiallyRef = useRef(false);
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
   const [showTopGenerationOnly, setShowTopGenerationOnly] = useState(false);
+  const [peopleSearch, setPeopleSearch] = useState("");
   const expandableIds = useMemo(() => getExpandableIds(people), [people]);
+
+  const filteredPeople = useMemo(() => {
+    const query = peopleSearch.trim().toLowerCase();
+    if (!query) {
+      return people;
+    }
+
+    return people.filter((person) => {
+      const name = person.name.toLowerCase();
+      const chineseName = (person.chineseName ?? "").toLowerCase();
+      return name.includes(query) || chineseName.includes(query);
+    });
+  }, [people, peopleSearch]);
 
   const collapsiblePeopleIds = useMemo(
     () => [...expandableIds],
@@ -244,6 +258,8 @@ function FamilyTree() {
     const personById = new Map(sortedByBirth.map((person) => [person.id, person]));
     const generationById = getGenerationById(sortedByBirth);
     const nodeGapX = 300;
+    const nodeWidth = 220;
+    const nodeMinGapX = 44;
     const familyGapColumns = 0.55;
     const regularGapColumns = 0.12;
     const branchGroupGapColumns = 1.15;
@@ -348,6 +364,7 @@ function FamilyTree() {
       const placed = new Set<string>();
       let cursor = 0;
       let lastParentGroupKey: string | null = null;
+      let nextFreeX = 0;
 
       const orderedIds = [...ids].sort((aId, bId) => {
         const a = personById.get(aId);
@@ -374,13 +391,33 @@ function FamilyTree() {
         return (fileOrderIndex.get(aId) ?? 0) - (fileOrderIndex.get(bId) ?? 0);
       });
 
-      const pushNode = (person: Person, x: number, hidden: boolean) => {
-        positionedXById.set(person.id, x);
+      const siblingIdsByParent = new Map<string, string[]>();
+      orderedIds.forEach((id) => {
+        const person = personById.get(id);
+        const primaryParentId = person?.parents?.[0];
+        if (!primaryParentId || !positionedXById.has(primaryParentId)) {
+          return;
+        }
+
+        const siblings = siblingIdsByParent.get(primaryParentId) ?? [];
+        siblings.push(id);
+        siblingIdsByParent.set(primaryParentId, siblings);
+      });
+
+      const reserveVisibleX = (desiredX: number) => {
+        const x = Math.max(desiredX, nextFreeX);
+        nextFreeX = x + nodeWidth + nodeMinGapX;
+        return x;
+      };
+
+      const pushNode = (person: Person, x: number, hidden: boolean, reserveSpace: boolean) => {
+        const finalX = !hidden && reserveSpace ? reserveVisibleX(x) : x;
+        positionedXById.set(person.id, finalX);
 
         treeNodes.push({
           id: person.id,
           type: "personNode",
-          position: { x, y: 180 * generation },
+          position: { x: finalX, y: 180 * generation },
           data: {
             name: person.name,
             chineseName: person.chineseName,
@@ -415,6 +452,28 @@ function FamilyTree() {
         return sum / parentXs.length;
       };
 
+      const getDesiredChildSlotX = (person: Person): number | null => {
+        const primaryParentId = person.parents[0];
+        if (!primaryParentId) {
+          return null;
+        }
+
+        const parentX = positionedXById.get(primaryParentId);
+        const siblingIds = siblingIdsByParent.get(primaryParentId);
+
+        if (parentX === undefined || !siblingIds || siblingIds.length === 0) {
+          return null;
+        }
+
+        const index = siblingIds.indexOf(person.id);
+        if (index < 0) {
+          return null;
+        }
+
+        const offset = index - (siblingIds.length - 1) / 2;
+        return parentX + offset * nodeGapX * 0.9;
+      };
+
       orderedIds.forEach((id) => {
         if (placed.has(id)) {
           return;
@@ -443,20 +502,21 @@ function FamilyTree() {
 
         if (!personHidden && spouse && !spouseHidden) {
           // Keep couples adjacent, then reserve extra columns for descendant branches.
-          const personDesired = getDesiredCenterX(person);
-          const spouseDesired = getDesiredCenterX(spouse);
+          const personDesired = getDesiredChildSlotX(person) ?? getDesiredCenterX(person);
+          const spouseDesired = getDesiredChildSlotX(spouse) ?? getDesiredCenterX(spouse);
           const desiredCenter = personDesired ?? spouseDesired ?? null;
           const minLeftX = cursor * nodeGapX;
           const leftX = Math.max(minLeftX, desiredCenter !== null ? desiredCenter - nodeGapX / 2 : minLeftX);
 
-          pushNode(person, leftX, false);
-          pushNode(spouse, leftX + nodeGapX, false);
+          const placedLeftX = reserveVisibleX(leftX);
+          pushNode(person, placedLeftX, false, false);
+          pushNode(spouse, placedLeftX + nodeGapX, false, true);
 
           const personSpan = Math.max(1, getVisibleBranchSpan(person.id));
           const reservedColumns = Math.max(2, personSpan);
           const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
 
-          cursor = leftX / nodeGapX + reservedColumns + gapAfter;
+          cursor = Math.max(cursor, placedLeftX / nodeGapX + reservedColumns + gapAfter);
           lastParentGroupKey = parentGroupKey;
           placed.add(person.id);
           placed.add(spouse.id);
@@ -465,19 +525,24 @@ function FamilyTree() {
 
         const span = personHidden ? 0 : Math.max(1, getVisibleBranchSpan(person.id));
         const minCenterX = (cursor + (span - 1) / 2) * nodeGapX;
-        const desiredCenterX = getDesiredCenterX(person);
-        const x = personHidden ? 0 : Math.max(minCenterX, desiredCenterX ?? minCenterX);
-        pushNode(person, x, personHidden);
+        const desiredCenterX = getDesiredChildSlotX(person) ?? getDesiredCenterX(person);
+        const x = personHidden
+          ? 0
+          : generation === 0
+            ? Math.max(minCenterX, desiredCenterX ?? minCenterX)
+            : (desiredCenterX ?? minCenterX);
+        pushNode(person, x, personHidden, true);
 
         if (!personHidden) {
           const gapAfter = hasVisiblePrimaryChildren ? familyGapColumns : regularGapColumns;
-          const leftCol = x / nodeGapX - (span - 1) / 2;
-          cursor = leftCol + span + gapAfter;
+          const placedX = positionedXById.get(person.id) ?? x;
+          const leftCol = placedX / nodeGapX - (span - 1) / 2;
+          cursor = Math.max(cursor, leftCol + span + gapAfter);
           lastParentGroupKey = parentGroupKey;
         }
 
         if (spouse) {
-          pushNode(spouse, 0, spouseHidden);
+          pushNode(spouse, 0, spouseHidden, false);
           placed.add(spouse.id);
         }
 
@@ -551,6 +616,30 @@ function FamilyTree() {
     [navigate]
   );
 
+  const handleFlowInit = useCallback(
+    (instance: ReactFlowInstance) => {
+      if (hasCenteredInitiallyRef.current) {
+        return;
+      }
+
+      const visibleNodes = nodes.filter((node) => !node.hidden);
+      if (visibleNodes.length === 0) {
+        return;
+      }
+
+      const minY = Math.min(...visibleNodes.map((node) => node.position.y));
+      const topNodes = visibleNodes.filter((node) => node.position.y === minY);
+
+      const targetNode = [...topNodes].sort((a, b) => a.position.x - b.position.x)[0];
+      const targetX = targetNode.position.x + 110;
+      const targetY = targetNode.position.y + 46;
+
+      instance.setCenter(targetX, targetY, { duration: 250, zoom: 1 });
+      hasCenteredInitiallyRef.current = true;
+    },
+    [nodes]
+  );
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -576,6 +665,7 @@ function FamilyTree() {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          onInit={handleFlowInit}
           onNodeClick={handleNodeClick}
           nodesDraggable={false}
           nodesConnectable={false}
@@ -585,18 +675,31 @@ function FamilyTree() {
         </ReactFlow>
       </div>
 
+      <div className="people-search-row">
+        <label htmlFor="people-search" className="people-search-label">
+          Search people
+        </label>
+        <input
+          id="people-search"
+          className="people-search-input"
+          type="search"
+          placeholder="Search by name or Chinese name"
+          value={peopleSearch}
+          onChange={(event) => setPeopleSearch(event.target.value)}
+        />
+      </div>
+
       <div className="card-grid">
-        {people.map((person) => (
+        {filteredPeople.map((person) => (
           <Link key={person.id} to={`/person/${person.id}`} className="person-card-link">
             <article className="person-card">
               <h3>{person.name}</h3>
               {person.chineseName && <p className="person-card__chinese">{person.chineseName}</p>}
-              <p>
-                {person.birth.year ?? "?"} - {person.death.year ?? "Present"}
-              </p>
+              <p>{getCardYearText(person)}</p>
             </article>
           </Link>
         ))}
+        {filteredPeople.length === 0 && <p className="people-search-empty">No people matched your search.</p>}
       </div>
     </section>
   );
