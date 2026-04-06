@@ -9,6 +9,13 @@ function formatLifeEvent(event: { date?: string | null; year: number | null; pla
   return `${dateOrYear}${event.place ? `, ${event.place}` : ""}`;
 }
 
+function normalizeBioToPresentTense(text: string): string {
+  return text
+    .replace(/\bwas\b/gi, "is")
+    .replace(/\bwere\b/gi, "are")
+    .replace(/\bhad\b/gi, "has");
+}
+
 function formatDeathEvent(event: { date?: string | null; year: number | null; place: string | null }) {
   if (!event.date && event.year === null && event.place) {
     return `Deceased, ${event.place}`;
@@ -138,7 +145,7 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Bio</h3>
-        <p className="multiline-text">{person.bio}</p>
+        <p className="multiline-text">{normalizeBioToPresentTense(person.bio)}</p>
       </section>
 
       <section className="profile-section relatives-list">

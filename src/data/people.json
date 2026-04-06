@@ -4,7 +4,7 @@
     "chineseName": "佘氏祖先在中国",
     "parents": [],
     "children": ["shea-woon-mun","shea-keng-yat"],
-    "bio": "The Shea family originated from ZhongShan (中山) (formerly HeongShan 香山) in Guangdong, China. The family has a long history in the region, with records dating back several generations. The ancestors were primarily involved in agriculture and local trade before some members migrated to Malaya in the early 20th century."
+    "bio": "The Shea family originated from ZhongShan (中山) (formerly HeongShan 香山) in Guangdong, China. \n\nThe family has a long history in the region, with records dating back several generations. \n\n The ancestors were primarily involved in trade before some members migrated to Malaya in the early 20th century."
   },
   {
     "id": "shea-woon-mun",
@@ -77,7 +77,7 @@
     },
     "parents": ["shea-woon-mun","tham-yoke-keng"],
     "spouses": ["lee-mun-kay"],
-    "children": ["shea-yuet-ming","shea-weng-keong","shea-weng-cheong"],
+    "children": ["shea-yuet-ming","shea-weng-keong","shea-weng-cheong","shea-yuet-seong"],
     "bio": "Poh Sum was the son of Woon Mun and Yoke Keng. He migrated to Malaya with his parents and later part of life settled in Petaling Jaya, Selangor. \n He was an avid photographer and managed a photography business in downtown Kuala Lumpur. Poh Sum was known for his dedication to family."
   },
   {
@@ -95,6 +95,7 @@
     },
     "parents": [],
     "spouses": ["shea-poh-sum"],
+    "children": ["shea-yuet-ming","shea-weng-keong","shea-weng-cheong","shea-yuet-seong"],
     "bio": "Mun Kay was born in Malaya. She married Poh Sum and lived in Petaling Jaya, Selangor."   
   },
   {
@@ -143,7 +144,21 @@
     ],
       "parents": ["shea-poh-sum","lee-mun-kay"],
       "children":["shea-wai-leong","shea-wai-ling"],
+      "spouses": ["lee-bee-loo"],
       "bio": "Weng Cheong is the second son of Poh Sum and Mun Kay. He was in the medical field in Kuala Lumpur. He now lives in Shah Alam, Selangor, Malaysia."
+  },
+  {
+    "id":"lee-bee-loo",
+    "name":"Lee Bee Loo",
+    "birth": {
+      "place": "Malaysia",
+      "year":1948,
+      "date":"1948-10-31"
+    },
+    "parents": [],
+    "spouses": ["shea-weng-cheong"],
+    "children":["shea-wai-leong","shea-wai-ling"],
+    "bio": "Bee Loo was born in Malaysia. She married Weng Cheong and lives in Shah Alam, Selangor, Malaysia."
   },
   {
     "id":"shea-wai-leong",
@@ -156,6 +171,7 @@
     },
     "parents": ["shea-weng-cheong"],
     "children": ["shea-wan-hoe"],
+    "spouses":["elaine-chen"],
     "locations":[
       {
         "type": "birth",
@@ -179,6 +195,31 @@
       }
     ],
     "bio": "Wai Leong is the eldest son of Weng Cheong. He was born in Petaling Jaya, Selangor, Malaysia, and later moved to Winnipeg, Manitoba, Canada for studies. \n\nHe returned to Malaysia in 1996 and currently lives in Shah Alam, Selangor. \n\n He also maintains the genealogy records for the family."
+  },
+  { 
+    "id":"elaine-chen",
+    "name":"Elaine Chen", 
+    "birth": {
+      "place": "Malaysia",
+      "year": 1977,
+      "date":"1977-10-25"
+    },  
+    "parents": [],
+    "spouses": ["shea-wai-leong"],
+    "children":["shea-wan-hoe"],
+    "locations":[ 
+      {
+        "type": "birth",
+        "place": "Kuala Lumpur, Malaysia",
+        "year": 1977
+      },
+      {
+        "type": "residence",
+        "place": "Shah Alam, Selangor, Malaysia",
+        "year": 1998
+      }
+    ],
+    "bio": "Elaine Chen was born in Kuala Lumpur, Malaysia. She married Wai Leong and currently lives in Shah Alam, Selangor, Malaysia."
   },
   {
     "id":"shea-wan-hoe",
@@ -230,7 +271,7 @@
         "year": 2017
       }
     ],
-    "parents": ["shea-weng-cheong"],
+    "parents": ["shea-weng-cheong","lee-bee-loo"],
     "bio": "Wai Ling is the second child and only daughter of Weng Cheong. She was born in Petaling Jaya, Selangor, Malaysia, and later moved to Shah Alam, Selangor, Malaysia. She currently lives in Singapore."
   },
   {

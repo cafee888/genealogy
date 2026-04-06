@@ -33,5 +33,47 @@
     "caption": "Gravestone Photo of Shea Woon Mun at Kepong Chinese Cemetery",
     "location": "Malaysia",
     "people": ["shea-woon-mun"]
-  }
+  },
+      {
+    "id": "p0006",
+    "url": "/photos/Shea Keng Yat (2).jpeg",
+    "caption": "Gravestone Photo of Shea Keng Yat at Kepong Chinese Cemetery",
+    "location": "Malaysia",
+    "people": ["shea-keng-yat"]
+  },
+  {
+    "id": "p0007",
+    "url": "/photos/Tham Yoke Keng Family Portrait.jpg",
+    "caption": "Family portrait of Tham Yoke Keng",
+    "location": "Segambut, Malaysia",
+    "people": ["tham-yoke-keng","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam","shea-yoke-ling","lee-mun-kay","shea-poh-sum","shea-weng-cheong","shea-weng-keong","shea-yuet-ming","shea-yuet-seong"]
+ },
+   {
+    "id": "p0008",
+    "url": "/photos/Tham Yoke Keng 84th Birthday.jpg",
+    "caption": "84th Birthday celebration for Tham Yoke Keng",
+    "location": "Malaysia",
+    "people": ["tham-yoke-keng","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam","shea-yoke-ling","lee-mun-kay","shea-poh-sum"]
+ },
+ {
+    "id": "p0008",
+    "url": "/photos/Tham Yoke Keng Family Portrait 2.jpg",
+    "caption": "Family portrait of Tham Yoke Keng",
+    "location": "Segambut, Malaysia",
+    "people": ["tham-yoke-keng","shea-kong-yew","shea-kong-choy","shea-yoke-lan","shea-kong-nam","shea-yoke-ling","lee-mun-kay","shea-poh-sum","shea-weng-cheong","shea-weng-keong","shea-yuet-ming","shea-yuet-seong"]
+ },
+  {
+    "id": "p0009",
+    "url": "/photos/Lee Mun Kay.JPG",
+    "caption": "Portrait of Lee Mun Kay",
+    "location": "Malaysia", 
+    "people": ["lee-mun-kay"]
+ },
+   {
+    "id": "p0010",
+    "url": "/photos/Sheh-Surname.jpg",
+    "caption": "Shea Surname in Chinese Characters",
+    "location": "China", 
+    "people": ["ancestor-china"]
+ }
 ]
