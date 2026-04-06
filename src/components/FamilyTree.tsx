@@ -211,11 +211,30 @@ function getExpandableIds(people: Person[]): Set<string> {
   return expandable;
 }
 
+function getInitialCollapsedIds(people: Person[]): Set<string> {
+  const sortedByBirth = getSortedByBirth(people);
+  const generationById = getGenerationById(sortedByBirth);
+  const expandableIds = getExpandableIds(people);
+  const initialCollapsed = new Set<string>();
+
+  sortedByBirth.forEach((person) => {
+    const generation = generationById.get(person.id) ?? 0;
+
+    // Keep the first 3 generations visible (0, 1, 2) and collapse deeper branches by default.
+    if (generation === 2 && expandableIds.has(person.id)) {
+      initialCollapsed.add(person.id);
+    }
+  });
+
+  return initialCollapsed;
+}
+
 function FamilyTree() {
   const people = getAllPeople();
   const navigate = useNavigate();
   const hasCenteredInitiallyRef = useRef(false);
-  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+  const defaultCollapsedIds = useMemo(() => getInitialCollapsedIds(people), [people]);
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => new Set(defaultCollapsedIds));
   const [showTopGenerationOnly, setShowTopGenerationOnly] = useState(false);
   const [peopleSearch, setPeopleSearch] = useState("");
   const expandableIds = useMemo(() => getExpandableIds(people), [people]);
@@ -605,9 +624,9 @@ function FamilyTree() {
   }, []);
 
   const handleCollapseAll = useCallback(() => {
-    setShowTopGenerationOnly(true);
-    setCollapsedIds(new Set(collapsiblePeopleIds));
-  }, [collapsiblePeopleIds]);
+    setShowTopGenerationOnly(false);
+    setCollapsedIds(new Set(defaultCollapsedIds));
+  }, [defaultCollapsedIds]);
 
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
