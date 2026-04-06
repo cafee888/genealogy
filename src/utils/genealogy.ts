@@ -69,11 +69,12 @@ export function getRelatives(personId: string): {
   parents: Person[];
   children: Person[];
   spouses: Person[];
+  siblings: Person[];
 } {
   const person = getPersonById(personId);
 
   if (!person) {
-    return { parents: [], children: [], spouses: [] };
+    return { parents: [], children: [], spouses: [], siblings: [] };
   }
 
   const mapIdsToPeople = (ids: string[]) =>
@@ -81,9 +82,24 @@ export function getRelatives(personId: string): {
       .map((id) => getPersonById(id))
       .filter((relative): relative is Person => relative !== undefined);
 
+  const siblingIds = new Set<string>();
+  person.parents.forEach((parentId) => {
+    const parent = getPersonById(parentId);
+    if (!parent) {
+      return;
+    }
+
+    parent.children.forEach((childId) => {
+      if (childId !== person.id) {
+        siblingIds.add(childId);
+      }
+    });
+  });
+
   return {
     parents: mapIdsToPeople(person.parents),
     children: mapIdsToPeople(person.children),
-    spouses: mapIdsToPeople(person.spouses)
+    spouses: mapIdsToPeople(person.spouses),
+    siblings: mapIdsToPeople(Array.from(siblingIds))
   };
 }
