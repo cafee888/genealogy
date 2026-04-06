@@ -252,11 +252,6 @@ function FamilyTree() {
     });
   }, [people, peopleSearch]);
 
-  const collapsiblePeopleIds = useMemo(
-    () => [...expandableIds],
-    [expandableIds]
-  );
-
   const handleToggleCollapse = useCallback((personId: string) => {
     setShowTopGenerationOnly(false);
     setCollapsedIds((previous) => {
