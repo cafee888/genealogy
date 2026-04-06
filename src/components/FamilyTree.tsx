@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Background,
   Controls,
@@ -40,7 +40,10 @@ function PersonNode({ id, data }: NodeProps) {
         <button
           type="button"
           className="tree-person-node__toggle nodrag"
-          onClick={() => personData.onToggle(id)}
+          onClick={(event) => {
+            event.stopPropagation();
+            personData.onToggle(id);
+          }}
           title={personData.collapsed ? "Expand descendants" : "Collapse descendants"}
         >
           {personData.collapsed ? "+" : "-"}
@@ -157,6 +160,7 @@ function getExpandableIds(people: Person[]): Set<string> {
 
 function FamilyTree() {
   const people = getAllPeople();
+  const navigate = useNavigate();
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => getDefaultCollapsedIds(people));
   const [showTopGenerationOnly, setShowTopGenerationOnly] = useState(false);
   const expandableIds = useMemo(() => getExpandableIds(people), [people]);
@@ -314,6 +318,13 @@ function FamilyTree() {
     setCollapsedIds(new Set(collapsiblePeopleIds));
   }, [collapsiblePeopleIds]);
 
+  const handleNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      navigate(`/person/${node.id}`);
+    },
+    [navigate]
+  );
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -339,6 +350,7 @@ function FamilyTree() {
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
+          onNodeClick={handleNodeClick}
           nodesDraggable={false}
           nodesConnectable={false}
         >
