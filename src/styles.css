@@ -83,6 +83,13 @@ body::before {
   color: var(--muted);
 }
 
+.topbar-maintained {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
 .topbar a,
 .text-link {
   color: var(--accent);

@@ -49,6 +49,22 @@ export function getPhotosForPerson(personId: string): Photo[] {
   return photos.filter((photo) => photo.people.includes(personId));
 }
 
+export function resolveAssetUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const encodedPath = encodeURI(path);
+  const baseUrl = import.meta.env.BASE_URL ?? "/";
+  const normalizedBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+
+  if (encodedPath.startsWith("/")) {
+    return `${normalizedBase}${encodedPath}`;
+  }
+
+  return `${baseUrl}${encodedPath}`;
+}
+
 export function getRelatives(personId: string): {
   parents: Person[];
   children: Person[];

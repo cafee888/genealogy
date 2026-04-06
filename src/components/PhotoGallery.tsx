@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Photo } from "../types";
+import { resolveAssetUrl } from "../utils/genealogy";
 
 interface PhotoGalleryProps {
   photos: Photo[];
@@ -21,7 +22,7 @@ function PhotoGallery({ photos, personId }: PhotoGalleryProps) {
           className="photo-card-link"
         >
           <article className="photo-card">
-            <img src={photo.url} alt={photo.caption} loading="lazy" />
+            <img src={resolveAssetUrl(photo.url)} alt={photo.caption} loading="lazy" />
             <div>
               <p>{photo.caption}</p>
               <small>

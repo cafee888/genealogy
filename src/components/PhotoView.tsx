@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { getAllPhotos, getPersonById } from "../utils/genealogy";
+import { getAllPhotos, getPersonById, resolveAssetUrl } from "../utils/genealogy";
 
 interface PhotoViewLocationState {
   fromPersonId?: string;
@@ -53,7 +53,7 @@ function PhotoView() {
 
       <div className="photo-zoom-frame">
         <img
-          src={photo.url}
+          src={resolveAssetUrl(photo.url)}
           alt={photo.caption}
           className="photo-large"
           style={{ transform: `scale(${zoom})`, transformOrigin: "center center" }}
