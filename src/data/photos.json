@@ -1,0 +1,42 @@
+[
+  {
+    "id": "photo-penang-port-1930",
+    "url": "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80",
+    "caption": "Arrival period near Penang harbor during early migration years.",
+    "year": 1930,
+    "location": "Penang, Malaysia",
+    "people": ["lim-wen-fu"]
+  },
+  {
+    "id": "photo-family-sitiawan-1965",
+    "url": "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1200&q=80",
+    "caption": "Three generations gathered in Sitiawan for Lunar New Year.",
+    "year": 1965,
+    "location": "Sitiawan, Perak, Malaysia",
+    "people": ["lim-wen-fu", "lee-soon-neo", "lim-cheng-huat"]
+  },
+  {
+    "id": "photo-kl-wedding-1975",
+    "url": "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=80",
+    "caption": "Wedding portrait of Cheng Huat and Yoke Lin.",
+    "year": 1975,
+    "location": "Kuala Lumpur, Malaysia",
+    "people": ["lim-cheng-huat", "ng-yoke-lin"]
+  },
+  {
+    "id": "photo-penang-visit-2015",
+    "url": "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1200&q=80",
+    "caption": "Mei Yan and Lucas exploring old clan houses in George Town.",
+    "year": 2015,
+    "location": "George Town, Penang, Malaysia",
+    "people": ["lim-mei-yan", "tan-lucas-hao"]
+  },
+  {
+    "id": "photo-pj-home-1988",
+    "url": "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1200&q=80",
+    "caption": "Sibling snapshot at the Petaling Jaya family home.",
+    "year": 1988,
+    "location": "Petaling Jaya, Malaysia",
+    "people": ["lim-mei-yan", "lim-jian-wei", "lim-cheng-huat", "ng-yoke-lin"]
+  }
+]

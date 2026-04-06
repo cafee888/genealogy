@@ -1,0 +1,246 @@
+[
+  {
+    "id": "lim-wen-fu",
+    "name": "Lim Wen Fu",
+    "birth": {
+      "year": 1912,
+      "place": "Fujian, China"
+    },
+    "death": {
+      "year": 1984,
+      "place": "Sitiawan, Perak, Malaysia"
+    },
+    "parents": [],
+    "spouses": ["lee-soon-neo"],
+    "children": ["lim-cheng-huat"],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Fujian, China",
+        "year": 1912
+      },
+      {
+        "type": "migration",
+        "place": "Penang, Malaysia",
+        "year": 1930
+      },
+      {
+        "type": "residence",
+        "place": "Sitiawan, Perak, Malaysia",
+        "year": 1945
+      }
+    ],
+    "burial": {
+      "place": "Sitiawan Chinese Cemetery",
+      "notes": "Buried beside spouse"
+    },
+    "bio": "Wen Fu migrated from Fujian in the early 1930s and later settled in Perak, where he worked as a tin workshop supervisor and helped establish a local clan association."
+  },
+  {
+    "id": "lee-soon-neo",
+    "name": "Lee Soon Neo",
+    "birth": {
+      "year": 1918,
+      "place": "Ipoh, Perak, Malaysia"
+    },
+    "death": {
+      "year": 1992,
+      "place": "Sitiawan, Perak, Malaysia"
+    },
+    "parents": [],
+    "spouses": ["lim-wen-fu"],
+    "children": ["lim-cheng-huat"],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Ipoh, Perak, Malaysia",
+        "year": 1918
+      },
+      {
+        "type": "residence",
+        "place": "Sitiawan, Perak, Malaysia",
+        "year": 1945
+      }
+    ],
+    "burial": {
+      "place": "Sitiawan Chinese Cemetery",
+      "notes": null
+    },
+    "bio": "Soon Neo was known for preserving family traditions, recording ancestral dates by hand, and organizing annual Qingming gatherings."
+  },
+  {
+    "id": "lim-cheng-huat",
+    "name": "Lim Cheng Huat",
+    "birth": {
+      "year": 1948,
+      "place": "Sitiawan, Perak, Malaysia"
+    },
+    "death": {
+      "year": null,
+      "place": null
+    },
+    "parents": ["lim-wen-fu", "lee-soon-neo"],
+    "spouses": ["ng-yoke-lin"],
+    "children": ["lim-mei-yan", "lim-jian-wei"],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Sitiawan, Perak, Malaysia",
+        "year": 1948
+      },
+      {
+        "type": "migration",
+        "place": "Kuala Lumpur, Malaysia",
+        "year": 1972
+      },
+      {
+        "type": "residence",
+        "place": "Petaling Jaya, Malaysia",
+        "year": 1980
+      }
+    ],
+    "burial": {
+      "place": null,
+      "notes": null
+    },
+    "bio": "Cheng Huat became a civil engineer in Kuala Lumpur and documented the family migration story for younger generations."
+  },
+  {
+    "id": "ng-yoke-lin",
+    "name": "Ng Yoke Lin",
+    "birth": {
+      "year": 1950,
+      "place": "Klang, Selangor, Malaysia"
+    },
+    "death": {
+      "year": null,
+      "place": null
+    },
+    "parents": [],
+    "spouses": ["lim-cheng-huat"],
+    "children": ["lim-mei-yan", "lim-jian-wei"],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Klang, Selangor, Malaysia",
+        "year": 1950
+      },
+      {
+        "type": "residence",
+        "place": "Petaling Jaya, Malaysia",
+        "year": 1980
+      }
+    ],
+    "burial": {
+      "place": null,
+      "notes": null
+    },
+    "bio": "Yoke Lin taught Mandarin at a community school and curated old family albums that later became digitized photos."
+  },
+  {
+    "id": "lim-mei-yan",
+    "name": "Lim Mei Yan",
+    "birth": {
+      "year": 1978,
+      "place": "Kuala Lumpur, Malaysia"
+    },
+    "death": {
+      "year": null,
+      "place": null
+    },
+    "parents": ["lim-cheng-huat", "ng-yoke-lin"],
+    "spouses": [],
+    "children": ["tan-lucas-hao"],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Kuala Lumpur, Malaysia",
+        "year": 1978
+      },
+      {
+        "type": "migration",
+        "place": "George Town, Penang, Malaysia",
+        "year": 2003
+      },
+      {
+        "type": "residence",
+        "place": "George Town, Penang, Malaysia",
+        "year": 2004
+      }
+    ],
+    "burial": {
+      "place": null,
+      "notes": null
+    },
+    "bio": "Mei Yan works in heritage conservation and frequently traces old neighborhoods where earlier generations lived."
+  },
+  {
+    "id": "lim-jian-wei",
+    "name": "Lim Jian Wei",
+    "birth": {
+      "year": 1982,
+      "place": "Petaling Jaya, Malaysia"
+    },
+    "death": {
+      "year": null,
+      "place": null
+    },
+    "parents": ["lim-cheng-huat", "ng-yoke-lin"],
+    "spouses": [],
+    "children": [],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "Petaling Jaya, Malaysia",
+        "year": 1982
+      },
+      {
+        "type": "migration",
+        "place": "Johor Bahru, Malaysia",
+        "year": 2010
+      },
+      {
+        "type": "residence",
+        "place": "Johor Bahru, Malaysia",
+        "year": 2012
+      }
+    ],
+    "burial": {
+      "place": null,
+      "notes": null
+    },
+    "bio": "Jian Wei is a software architect who built the first static website prototype for preserving the family archive."
+  },
+  {
+    "id": "tan-lucas-hao",
+    "name": "Tan Lucas Hao",
+    "birth": {
+      "year": 2010,
+      "place": "George Town, Penang, Malaysia"
+    },
+    "death": {
+      "year": null,
+      "place": null
+    },
+    "parents": ["lim-mei-yan"],
+    "spouses": [],
+    "children": [],
+    "locations": [
+      {
+        "type": "birth",
+        "place": "George Town, Penang, Malaysia",
+        "year": 2010
+      },
+      {
+        "type": "residence",
+        "place": "George Town, Penang, Malaysia",
+        "year": 2010
+      }
+    ],
+    "burial": {
+      "place": null,
+      "notes": null
+    },
+    "bio": "Lucas represents the fourth generation in the digital archive and appears in family photo collections tagged with grandparents and great-grandparents."
+  }
+]
