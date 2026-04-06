@@ -8,7 +8,7 @@ function App() {
     <div className="app-shell">
       <header className="topbar">
         <div>
-          <h1>Lim Family Digital Archive</h1>
+          <h1>Shea (佘) Family Digital Archive (Malaysia)</h1>
           <p>Static genealogy explorer for lineage, migration, and memory.</p>
         </div>
         <nav>
