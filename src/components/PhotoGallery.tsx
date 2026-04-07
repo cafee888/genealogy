@@ -25,10 +25,7 @@ function PhotoGallery({ photos, personId }: PhotoGalleryProps) {
             <img src={resolveAssetUrl(photo.url)} alt={photo.caption} loading="lazy" />
             <div>
               <p>{photo.caption}</p>
-              <small>
-                {photo.year ?? "Unknown"}
-                {photo.location ? `, ${photo.location}` : ""}
-              </small>
+              <small>{[photo.year, photo.location].filter((value) => value !== null).join(", ")}</small>
             </div>
           </article>
         </Link>
