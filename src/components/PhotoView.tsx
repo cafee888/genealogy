@@ -65,7 +65,7 @@ function PhotoView() {
       </div>
 
       <p className="caption">{photo.caption}</p>
-      {photo.year !== null ? (
+      {photo.year != null ? (
         <p>
           <strong>Year:</strong> {photo.year}
         </p>

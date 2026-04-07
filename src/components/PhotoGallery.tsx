@@ -25,7 +25,13 @@ function PhotoGallery({ photos, personId }: PhotoGalleryProps) {
             <img src={resolveAssetUrl(photo.url)} alt={photo.caption} loading="lazy" />
             <div>
               <p>{photo.caption}</p>
-              <small>{[photo.year, photo.location].filter((value) => value !== null).join(", ")}</small>
+              {(() => {
+                const metaParts = [photo.year, photo.location].filter(
+                  (value): value is number | string => value !== null && value !== undefined && `${value}`.trim() !== ""
+                );
+
+                return metaParts.length > 0 ? <small>{metaParts.join(", ")}</small> : null;
+              })()}
             </div>
           </article>
         </Link>
