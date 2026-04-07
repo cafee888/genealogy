@@ -19,6 +19,7 @@ import type { Person } from "../types";
 const MIN_TREE_ZOOM = 0.2;
 const LEVEL3_GENERATION_INDEX = 2;
 const TREE_LAYOUT_STORAGE_KEY = "genealogy.tree.layout";
+const LOW_PERFORMANCE_MEDIA_QUERY = "(max-width: 900px), (pointer: coarse), (prefers-reduced-motion: reduce)";
 
 interface PersonNodeData {
   name: string;
@@ -555,6 +556,13 @@ function FamilyTree() {
   const [showTopGenerationOnly, setShowTopGenerationOnly] = useState(false);
   const [peopleSearch, setPeopleSearch] = useState("");
   const [isExportingImage, setIsExportingImage] = useState(false);
+  const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.matchMedia(LOW_PERFORMANCE_MEDIA_QUERY).matches;
+  });
   const expandableIds = useMemo(() => getExpandableIds(people), [people]);
 
   useEffect(() => {
@@ -575,6 +583,20 @@ function FamilyTree() {
       setIsLeftToRightLayout(media.matches);
     }
 
+    media.addEventListener("change", handleChange);
+
+    return () => {
+      media.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia(LOW_PERFORMANCE_MEDIA_QUERY);
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsLowPerformanceMode(event.matches);
+    };
+
+    setIsLowPerformanceMode(media.matches);
     media.addEventListener("change", handleChange);
 
     return () => {
@@ -891,7 +913,7 @@ function FamilyTree() {
               background: person.deceased
                 ? "linear-gradient(160deg, #f1f4f7, #d7e0ea)"
                 : "linear-gradient(160deg, #f8fbff, #e1efff)",
-              boxShadow: "0 8px 22px rgba(5, 15, 26, 0.25)"
+              boxShadow: isLowPerformanceMode ? "none" : "0 8px 22px rgba(5, 15, 26, 0.25)"
             }
           });
         };
@@ -1030,8 +1052,8 @@ function FamilyTree() {
           className: "parent-link",
           hidden: hiddenNodeIds.has(person.id) || hiddenNodeIds.has(childId),
           markerEnd: { type: MarkerType.ArrowClosed, color: "#5dd6ff" },
-          animated: true,
-          style: { stroke: "#5dd6ff", strokeWidth: 2.9 }
+          animated: !isLowPerformanceMode,
+          style: { stroke: "#5dd6ff", strokeWidth: isLowPerformanceMode ? 2.2 : 2.9 }
         });
       });
 
@@ -1046,15 +1068,15 @@ function FamilyTree() {
             className: "spouse-link",
             hidden: hiddenNodeIds.has(person.id) || hiddenNodeIds.has(spouseId),
             type: "straight",
-            animated: true,
-            style: { stroke: "#ff6fae", strokeDasharray: "8 5", strokeWidth: 3.1 }
+            animated: !isLowPerformanceMode,
+            style: { stroke: "#ff6fae", strokeDasharray: "8 5", strokeWidth: isLowPerformanceMode ? 2.4 : 3.1 }
           });
         }
       });
     });
 
     return { nodes: treeNodes, edges: treeEdges };
-  }, [people, collapsedIds, handleToggleCollapse, showTopGenerationOnly, expandableIds, isLeftToRightLayout]);
+  }, [people, collapsedIds, handleToggleCollapse, showTopGenerationOnly, expandableIds, isLeftToRightLayout, isLowPerformanceMode]);
 
   const handleExpandAll = useCallback(() => {
     setShowTopGenerationOnly(false);
@@ -1529,13 +1551,14 @@ function FamilyTree() {
           minZoom={MIN_TREE_ZOOM}
           nodes={nodes}
           edges={edges}
+          onlyRenderVisibleElements
           nodeTypes={nodeTypes}
           onInit={handleFlowInit}
           onNodeClick={handleNodeClick}
           nodesDraggable={false}
           nodesConnectable={false}
         >
-          <Background gap={24} color="#c7d4d8" />
+          {!isLowPerformanceMode ? <Background gap={24} color="#c7d4d8" /> : null}
           <Controls />
         </ReactFlow>
       </div>
