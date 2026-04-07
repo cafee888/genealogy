@@ -84,6 +84,75 @@
     "location": "Shah Alam, Malaysia",
     "year": 2026, 
     "people": ["shea-weng-cheong","shea-yuet-ming","shea-yuet-seong","lee-bee-loo","shea-wai-leong","elaine-chen","shea-wan-hoe"]
+  },
+  {
+    "id": "p0013",
+    "url": "/photos/Lee Mun Kay 2.jpeg",
+    "caption": "Portrait of Lee Mun Kay",
+    "location": "Malaysia",
+    "people": ["lee-mun-kay"]
+  },
+  {
+    "id": "p0014",
+    "url": "/photos/Shea Poh Sum.jpeg",
+    "caption": "Portrait of Shea Poh Sum",
+    "location": "Malaysia",
+    "people": ["shea-poh-sum"]
+  },
+  {
+    "id": "p0015",
+    "url": "/photos/Shea Poh Sum Wedding.jpeg",
+    "caption": "Wedding portrait of Shea Poh Sum and Lee Mun Kay",
+    "location": "Malaysia",
+    "people": ["shea-poh-sum","lee-mun-kay"]
+  },
+  {
+    "id": "p0016",
+    "url": "/photos/Shea Poh Sum 2.jpeg",
+    "caption": "Portrait of Shea Poh Sum",
+    "location": "Malaysia",
+    "people": ["shea-poh-sum"]
+  },
+  {
+    "id": "p0017",
+    "url": "/photos/Shea Poh Sum Birthday Family 2.jpeg",
+    "caption": "Family portrait during Shea Poh Sum's birthday celebration",  
+    "location": "Malaysia",
+    "people": ["shea-weng-cheong","shea-yuet-ming","shea-yuet-seong","lee-bee-loo","shea-wai-leong","shea-wai-ling","lee-mun-kay"]
+  },
+  {
+    "id": "p0018",
+    "url": "/photos/Shea Poh Sum and Lee Mun Kay.jpeg",
+    "caption": "Shea Poh Sum and Lee Mun Kay",
+    "location": "Malaysia",
+    "people": ["shea-poh-sum","lee-mun-kay"]
+  },
+  {
+    "id": "p0019",
+    "url": "/photos/Lee Mun Kay 3.jpeg",
+    "caption": "Portrait of Lee Mun Kay",
+    "location": "Malaysia",
+    "people": ["lee-mun-kay"]
+  },
+  {
+    "id": "p0020",
+    "url": "/photos/Tham Yoke Keng 2.jpeg",
+    "caption": "Portrait of Tham Yoke Keng",
+    "location": "Malaysia",
+    "people": ["tham-yoke-keng"]
+  },
+  {
+    "id": "p0021",
+    "url": "/photos/Tham Yoke Keng 3.jpeg",
+    "caption": "Portrait of Tham Yoke Keng",
+    "location": "Malaysia",
+    "people": ["tham-yoke-keng"]
+  },
+  {
+    "id": "p0022",
+    "url": "/photos/Shea Poh Sum Birthday Family.jpeg",
+"caption": "Family portrait during Shea Poh Sum's birthday celebration",  
+    "location": "Malaysia",
+    "people": ["shea-weng-cheong","shea-yuet-ming","shea-yuet-seong","lee-bee-loo","shea-wai-leong","shea-wai-ling","lee-mun-kay"]
   }
-  
 ]
