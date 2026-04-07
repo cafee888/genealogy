@@ -30,6 +30,288 @@ interface PersonNodeData {
   onToggle: (id: string) => void;
 }
 
+interface ExportNode {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  data: PersonNodeData;
+}
+
+function getNodeSize(node: Node): { width: number; height: number } {
+  const data = node.data as unknown as PersonNodeData;
+  const estimatedNameLines = Math.max(1, Math.min(2, Math.ceil((data.name?.length ?? 0) / 14)));
+  const estimatedHeight = 36 + estimatedNameLines * 23 + (data.chineseName ? 24 : 0) + (data.yearText ? 24 : 0);
+
+  return {
+    width: node.measured?.width ?? node.width ?? 220,
+    height: Math.max(node.measured?.height ?? node.height ?? 92, estimatedHeight)
+  };
+}
+
+function getHandlePoint(node: ExportNode, handle: string): { x: number; y: number } {
+  const { width, height } = node;
+
+  switch (handle) {
+    case "top":
+      return { x: node.x + width / 2, y: node.y };
+    case "bottom":
+      return { x: node.x + width / 2, y: node.y + height };
+    case "left":
+      return { x: node.x, y: node.y + height / 2 };
+    case "right":
+    default:
+      return { x: node.x + width, y: node.y + height / 2 };
+  }
+}
+
+function buildExportNodes(nodes: Node[], edges: Edge[], isLeftToRightLayout: boolean): ExportNode[] {
+  const minGap = 72;
+  const bandTolerance = 26;
+  const generationGap = 140;
+  const globalMargin = 26;
+  const byBand = new Map<number, ExportNode[]>();
+
+  const exportNodes = nodes.map((node) => {
+    const size = getNodeSize(node);
+    const data = node.data as unknown as PersonNodeData;
+
+    return {
+      id: node.id,
+      x: node.position.x,
+      y: node.position.y,
+      width: size.width,
+      height: size.height,
+      data
+    };
+  });
+
+  exportNodes.forEach((node) => {
+    const bandAxis = isLeftToRightLayout ? node.x : node.y;
+    const bandKey = Math.round(bandAxis / bandTolerance);
+    const bucket = byBand.get(bandKey) ?? [];
+    bucket.push(node);
+    byBand.set(bandKey, bucket);
+  });
+
+  const orderedBands = [...byBand.entries()].sort((a, b) => {
+    const aAvg = a[1].reduce((sum, node) => sum + (isLeftToRightLayout ? node.x : node.y), 0) / a[1].length;
+    const bAvg = b[1].reduce((sum, node) => sum + (isLeftToRightLayout ? node.x : node.y), 0) / b[1].length;
+    return aAvg - bAvg;
+  });
+
+  const bandIndexByNodeId = new Map<string, number>();
+  let nextBandAxisStart: number | null = null;
+
+  orderedBands.forEach(([, bandNodes], bandIndex) => {
+    const originalBandAxis =
+      bandNodes.reduce((sum, node) => sum + (isLeftToRightLayout ? node.x : node.y), 0) / bandNodes.length;
+    const bandAxisStart =
+      nextBandAxisStart === null ? originalBandAxis : Math.max(originalBandAxis, nextBandAxisStart);
+
+    const maxBandCrossSize = Math.max(
+      ...bandNodes.map((node) => (isLeftToRightLayout ? node.width : node.height))
+    );
+
+    bandNodes.forEach((node) => {
+      bandIndexByNodeId.set(node.id, bandIndex);
+      if (isLeftToRightLayout) {
+        node.x = bandAxisStart;
+      } else {
+        node.y = bandAxisStart;
+      }
+    });
+
+    nextBandAxisStart = bandAxisStart + maxBandCrossSize + generationGap;
+  });
+
+  // Row 3 adjustment: center each node over its child group to improve readability.
+  if (orderedBands.length >= 4) {
+    const thirdBand = orderedBands[2][1];
+    const exportNodeById = new Map(exportNodes.map((node) => [node.id, node]));
+    const childIdsByParent = new Map<string, string[]>();
+
+    edges.forEach((edge) => {
+      const isSpouseLink = edge.className?.includes("spouse-link") ?? false;
+      if (isSpouseLink) {
+        return;
+      }
+
+      const parentBand = bandIndexByNodeId.get(edge.source);
+      const childBand = bandIndexByNodeId.get(edge.target);
+      if (parentBand !== 2 || childBand === undefined || childBand <= parentBand) {
+        return;
+      }
+
+      const children = childIdsByParent.get(edge.source) ?? [];
+      children.push(edge.target);
+      childIdsByParent.set(edge.source, children);
+    });
+
+    const planned = thirdBand
+      .map((node) => {
+        const childIds = childIdsByParent.get(node.id) ?? [];
+        if (childIds.length === 0) {
+          return { node, desired: isLeftToRightLayout ? node.y : node.x };
+        }
+
+        const childCenters = childIds
+          .map((childId) => exportNodeById.get(childId))
+          .filter((child): child is ExportNode => !!child)
+          .map((child) => (isLeftToRightLayout ? child.y + child.height / 2 : child.x + child.width / 2));
+
+        if (childCenters.length === 0) {
+          return { node, desired: isLeftToRightLayout ? node.y : node.x };
+        }
+
+        const avgChildCenter = childCenters.reduce((sum, value) => sum + value, 0) / childCenters.length;
+        const desiredStart = isLeftToRightLayout
+          ? avgChildCenter - node.height / 2
+          : avgChildCenter - node.width / 2;
+
+        return { node, desired: desiredStart };
+      })
+      .sort((a, b) => a.desired - b.desired);
+
+    let nextStart = Number.NEGATIVE_INFINITY;
+    planned.forEach(({ node, desired }) => {
+      const span = isLeftToRightLayout ? node.height : node.width;
+      const adjusted = Math.max(desired, nextStart);
+
+      if (isLeftToRightLayout) {
+        node.y = adjusted;
+      } else {
+        node.x = adjusted;
+      }
+
+      nextStart = adjusted + span + minGap;
+    });
+  }
+
+  byBand.forEach((bandNodes) => {
+    bandNodes.sort((a, b) => {
+      const aSecondary = isLeftToRightLayout ? a.y : a.x;
+      const bSecondary = isLeftToRightLayout ? b.y : b.x;
+      return aSecondary - bSecondary;
+    });
+
+    let nextStart = Number.NEGATIVE_INFINITY;
+
+    bandNodes.forEach((node) => {
+      const secondaryStart = isLeftToRightLayout ? node.y : node.x;
+      const secondarySize = isLeftToRightLayout ? node.height : node.width;
+      const adjustedStart = Math.max(secondaryStart, nextStart);
+
+      if (isLeftToRightLayout) {
+        node.y = adjustedStart;
+      } else {
+        node.x = adjustedStart;
+      }
+
+      nextStart = adjustedStart + secondarySize + minGap;
+    });
+  });
+
+  const overlaps = (a: ExportNode, b: ExportNode, margin: number): boolean => {
+    return !(
+      a.x + a.width + margin <= b.x ||
+      b.x + b.width + margin <= a.x ||
+      a.y + a.height + margin <= b.y ||
+      b.y + b.height + margin <= a.y
+    );
+  };
+
+  // Final pass: resolve any remaining rectangle collisions across all bands.
+  const sorted = [...exportNodes].sort((a, b) => {
+    const aPrimary = isLeftToRightLayout ? a.x : a.y;
+    const bPrimary = isLeftToRightLayout ? b.x : b.y;
+    if (aPrimary !== bPrimary) {
+      return aPrimary - bPrimary;
+    }
+
+    const aSecondary = isLeftToRightLayout ? a.y : a.x;
+    const bSecondary = isLeftToRightLayout ? b.y : b.x;
+    return aSecondary - bSecondary;
+  });
+
+  for (let pass = 0; pass < 8; pass += 1) {
+    let moved = false;
+
+    for (let i = 0; i < sorted.length; i += 1) {
+      for (let j = i + 1; j < sorted.length; j += 1) {
+        const left = sorted[i];
+        const right = sorted[j];
+
+        if (!overlaps(left, right, globalMargin)) {
+          continue;
+        }
+
+        if (isLeftToRightLayout) {
+          const push = left.y + left.height + globalMargin - right.y;
+          right.y += Math.max(push, 0);
+        } else {
+          const push = left.x + left.width + globalMargin - right.x;
+          right.x += Math.max(push, 0);
+        }
+
+        moved = true;
+      }
+    }
+
+    if (!moved) {
+      break;
+    }
+  }
+
+  return exportNodes;
+}
+
+function drawRoundedRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.lineTo(x + width - r, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + r);
+  context.lineTo(x + width, y + height - r);
+  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  context.lineTo(x + r, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - r);
+  context.lineTo(x, y + r);
+  context.quadraticCurveTo(x, y, x + r, y);
+  context.closePath();
+}
+
+function wrapText(context: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const tokens = text.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) {
+    return [];
+  }
+
+  const lines: string[] = [];
+  let current = tokens[0];
+
+  for (let index = 1; index < tokens.length; index += 1) {
+    const next = `${current} ${tokens[index]}`;
+    if (context.measureText(next).width <= maxWidth) {
+      current = next;
+    } else {
+      lines.push(current);
+      current = tokens[index];
+    }
+  }
+
+  lines.push(current);
+  return lines;
+}
+
 function PersonNode({ id, data }: NodeProps) {
   const personData = data as unknown as PersonNodeData;
 
@@ -272,6 +554,7 @@ function FamilyTree() {
   const [isExpandAllMode, setIsExpandAllMode] = useState(false);
   const [showTopGenerationOnly, setShowTopGenerationOnly] = useState(false);
   const [peopleSearch, setPeopleSearch] = useState("");
+  const [isExportingImage, setIsExportingImage] = useState(false);
   const expandableIds = useMemo(() => getExpandableIds(people), [people]);
 
   useEffect(() => {
@@ -785,6 +1068,370 @@ function FamilyTree() {
     setCollapsedIds(new Set(defaultCollapsedIds));
   }, [defaultCollapsedIds]);
 
+  const handleExportImage = useCallback(async () => {
+    if (isExportingImage) {
+      return;
+    }
+
+    const instance = reactFlowRef.current;
+    if (!instance) {
+      return;
+    }
+
+    const imageWindow = window.open("", "genealogy-tree-image-viewer");
+    if (!imageWindow) {
+      return;
+    }
+
+    const loadingDoc = imageWindow.document;
+    loadingDoc.title = "Family Tree Image";
+    loadingDoc.body.innerHTML = "";
+    loadingDoc.body.style.margin = "0";
+    loadingDoc.body.style.display = "grid";
+    loadingDoc.body.style.placeItems = "center";
+    loadingDoc.body.style.minHeight = "100vh";
+    loadingDoc.body.style.background = "#ffffff";
+    loadingDoc.body.style.color = "#1f3b58";
+    loadingDoc.body.style.fontFamily = "'Plus Jakarta Sans', 'Segoe UI', sans-serif";
+    loadingDoc.body.textContent = "Rendering image...";
+
+    const previousCollapsedIds = new Set(collapsedIds);
+    const previousExpandAllMode = isExpandAllMode;
+    const previousTopGenerationOnly = showTopGenerationOnly;
+
+    setIsExportingImage(true);
+
+    try {
+      // Capture the complete graph by temporarily expanding all branches.
+      setShowTopGenerationOnly(false);
+      setIsExpandAllMode(true);
+      setCollapsedIds(new Set());
+
+      await new Promise<void>((resolve) => {
+        window.setTimeout(() => resolve(), 120);
+      });
+
+      // When the new tab takes focus, rAF in the source tab can stall.
+      // Use bounded timeout polling instead of frame callbacks.
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const hasHiddenNodes = instance.getNodes().some((node) => node.hidden);
+        if (!hasHiddenNodes) {
+          break;
+        }
+
+        await new Promise<void>((resolve) => {
+          window.setTimeout(() => resolve(), 80);
+        });
+      }
+
+      const visibleNodes = instance.getNodes().filter((node) => !node.hidden);
+      if (visibleNodes.length === 0) {
+        throw new Error("No visible nodes to render.");
+      }
+
+      const visibleNodeIds = new Set(visibleNodes.map((node) => node.id));
+      const visibleEdges = instance
+        .getEdges()
+        .filter((edge) => !edge.hidden && visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target));
+      const exportNodes = buildExportNodes(visibleNodes, visibleEdges, isLeftToRightLayout);
+      const nodeById = new Map(exportNodes.map((node) => [node.id, node]));
+      let dataUrl = "";
+
+      const minX = Math.min(...exportNodes.map((node) => node.x));
+      const minY = Math.min(...exportNodes.map((node) => node.y));
+      const maxX = Math.max(...exportNodes.map((node) => node.x + node.width));
+      const maxY = Math.max(...exportNodes.map((node) => node.y + node.height));
+
+      const padding = 92;
+      const logicalWidth = Math.max(1280, Math.ceil(maxX - minX + padding * 2));
+      const logicalHeight = Math.max(900, Math.ceil(maxY - minY + padding * 2));
+      const pixelRatio = 2;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = logicalWidth * pixelRatio;
+      canvas.height = logicalHeight * pixelRatio;
+
+      const context = canvas.getContext("2d");
+      if (!context) {
+        throw new Error("Unable to initialize canvas context.");
+      }
+
+      context.scale(pixelRatio, pixelRatio);
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, logicalWidth, logicalHeight);
+      context.translate(-minX + padding, -minY + padding);
+
+      visibleEdges.forEach((edge) => {
+          const sourceNode = nodeById.get(edge.source);
+          const targetNode = nodeById.get(edge.target);
+          if (!sourceNode || !targetNode) {
+            return;
+          }
+
+          const sourcePoint = getHandlePoint(sourceNode, edge.sourceHandle ?? "bottom");
+          const targetPoint = getHandlePoint(targetNode, edge.targetHandle ?? "top");
+          const isSpouse = edge.className?.includes("spouse-link") ?? false;
+
+          context.save();
+          context.strokeStyle = isSpouse ? "#ff6fae" : "#1395cb";
+          context.lineWidth = isSpouse ? 3 : 2.8;
+          context.setLineDash(isSpouse ? [10, 6] : []);
+          context.lineCap = "round";
+          context.lineJoin = "round";
+          context.beginPath();
+
+          const dx = targetPoint.x - sourcePoint.x;
+          const dy = targetPoint.y - sourcePoint.y;
+          const distance = Math.hypot(dx, dy) || 1;
+          const unitPerpX = -dy / distance;
+          const unitPerpY = dx / distance;
+
+          let control1X = sourcePoint.x + dx * 0.3;
+          let control1Y = sourcePoint.y + dy * 0.15;
+          let control2X = sourcePoint.x + dx * 0.7;
+          let control2Y = sourcePoint.y + dy * 0.85;
+
+          if (edge.type === "step") {
+            const sourceIsVertical = (edge.sourceHandle ?? "bottom") === "top" || (edge.sourceHandle ?? "bottom") === "bottom";
+            const targetIsVertical = (edge.targetHandle ?? "top") === "top" || (edge.targetHandle ?? "top") === "bottom";
+
+            if (sourceIsVertical && targetIsVertical) {
+              // Parent links in top-down layout: exit and enter with vertical tangents.
+              const verticalSpan = Math.max(36, Math.abs(dy) * 0.45);
+              const sourceDirection = (edge.sourceHandle ?? "bottom") === "top" ? -1 : 1;
+              const targetDirection = (edge.targetHandle ?? "top") === "bottom" ? 1 : -1;
+              control1X = sourcePoint.x;
+              control1Y = sourcePoint.y + sourceDirection * verticalSpan;
+              control2X = targetPoint.x;
+              control2Y = targetPoint.y + targetDirection * verticalSpan;
+            } else if (Math.abs(dx) >= Math.abs(dy)) {
+              const bend = Math.min(120, Math.max(42, Math.abs(dx) * 0.22));
+              control1X = sourcePoint.x + dx * 0.42;
+              control1Y = sourcePoint.y;
+              control2X = targetPoint.x - dx * 0.42;
+              control2Y = targetPoint.y;
+              control1Y += unitPerpY * bend * 0.25;
+              control2Y += unitPerpY * bend * 0.25;
+            } else {
+              const bend = Math.min(120, Math.max(42, Math.abs(dy) * 0.22));
+              control1X = sourcePoint.x;
+              control1Y = sourcePoint.y + dy * 0.42;
+              control2X = targetPoint.x;
+              control2Y = targetPoint.y - dy * 0.42;
+              control1X += unitPerpX * bend * 0.25;
+              control2X += unitPerpX * bend * 0.25;
+            }
+          } else {
+            const spouseBend = Math.min(56, Math.max(18, distance * 0.18));
+            control1Y += unitPerpY * spouseBend;
+            control1X += unitPerpX * spouseBend;
+            control2Y += unitPerpY * spouseBend;
+            control2X += unitPerpX * spouseBend;
+          }
+
+          context.moveTo(sourcePoint.x, sourcePoint.y);
+          context.bezierCurveTo(control1X, control1Y, control2X, control2Y, targetPoint.x, targetPoint.y);
+
+          context.stroke();
+
+          if (!isSpouse) {
+            const arrowLength = 11;
+            const arrowHalfWidth = 5.5;
+            const tangentX = targetPoint.x - control2X;
+            const tangentY = targetPoint.y - control2Y;
+            const magnitude = Math.hypot(tangentX, tangentY) || 1;
+            const ux = tangentX / magnitude;
+            const uy = tangentY / magnitude;
+
+            const baseX = targetPoint.x - ux * arrowLength;
+            const baseY = targetPoint.y - uy * arrowLength;
+            const perpX = -uy;
+            const perpY = ux;
+
+            context.fillStyle = "#1395cb";
+            context.beginPath();
+            context.moveTo(targetPoint.x, targetPoint.y);
+            context.lineTo(baseX + perpX * arrowHalfWidth, baseY + perpY * arrowHalfWidth);
+            context.lineTo(baseX - perpX * arrowHalfWidth, baseY - perpY * arrowHalfWidth);
+            context.closePath();
+            context.fill();
+          }
+
+          context.restore();
+        });
+
+      exportNodes.forEach((node) => {
+          const data = node.data;
+          const { width, height } = node;
+          const x = node.x;
+          const y = node.y;
+
+          context.save();
+          context.shadowColor = "rgba(0, 0, 0, 0.16)";
+          context.shadowBlur = 14;
+          context.shadowOffsetY = 4;
+
+          drawRoundedRect(context, x, y, width, height, 16);
+          context.fillStyle = data.deceased ? "#eef3f8" : "#eff7ff";
+          context.fill();
+          context.shadowColor = "transparent";
+
+          drawRoundedRect(context, x, y, width, height, 16);
+          context.strokeStyle = data.deceased ? "#9daebf" : "#5ab8db";
+          context.lineWidth = 1.4;
+          context.stroke();
+
+          context.textAlign = "center";
+
+          context.fillStyle = data.deceased ? "#34475b" : "#11263a";
+          context.font = "700 20px 'Plus Jakarta Sans', 'Segoe UI', sans-serif";
+          const nameLines = wrapText(context, data.name, width - 22).slice(0, 2);
+          const nameLineHeight = 23;
+          nameLines.forEach((line, lineIndex) => {
+            context.fillText(line, x + width / 2, y + 32 + lineIndex * nameLineHeight);
+          });
+
+          let infoY = y + 32 + nameLines.length * nameLineHeight;
+
+          if (data.chineseName) {
+            context.fillStyle = "#2d4c67";
+            context.font = "600 17px 'Noto Serif SC', 'Times New Roman', serif";
+            context.fillText(data.chineseName, x + width / 2, infoY);
+            infoY += 24;
+          }
+
+          if (data.yearText) {
+            context.fillStyle = "#1f3b58";
+            context.font = "700 17px 'Plus Jakarta Sans', 'Segoe UI', sans-serif";
+            context.fillText(data.yearText, x + width / 2, infoY);
+          }
+
+          context.restore();
+        });
+
+      dataUrl = canvas.toDataURL("image/png");
+
+      if (imageWindow) {
+        const documentRef = imageWindow.document;
+        documentRef.title = "Family Tree Image";
+        documentRef.body.innerHTML = "";
+
+        const viewportMeta = documentRef.createElement("meta");
+        viewportMeta.name = "viewport";
+        viewportMeta.content = "width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes";
+        documentRef.head.appendChild(viewportMeta);
+
+        documentRef.documentElement.style.height = "100%";
+        documentRef.body.style.margin = "0";
+        documentRef.body.style.height = "100%";
+        documentRef.body.style.background = "#ffffff";
+        documentRef.body.style.overflow = "hidden";
+
+        const viewer = documentRef.createElement("div");
+        viewer.style.position = "fixed";
+        viewer.style.inset = "0";
+        viewer.style.overflow = "auto";
+        viewer.style.touchAction = "pan-x pan-y pinch-zoom";
+        viewer.style.setProperty("-webkit-overflow-scrolling", "touch");
+        viewer.style.padding = "24px";
+        viewer.style.display = "grid";
+        viewer.style.placeItems = "center";
+        viewer.style.minHeight = "100%";
+
+        const preview = documentRef.createElement("img");
+        preview.src = dataUrl;
+        preview.alt = "Family tree";
+        preview.style.display = "block";
+        preview.style.width = "auto";
+        preview.style.height = "auto";
+        preview.style.maxWidth = "calc(100vw - 48px)";
+        preview.style.maxHeight = "calc(100vh - 48px)";
+        preview.style.objectFit = "contain";
+        preview.style.margin = "0 auto";
+        preview.style.boxShadow = "0 10px 28px rgba(12, 20, 32, 0.16)";
+
+        const actionBar = documentRef.createElement("div");
+        actionBar.style.position = "fixed";
+        actionBar.style.top = "14px";
+        actionBar.style.right = "14px";
+        actionBar.style.zIndex = "20";
+        actionBar.style.display = "flex";
+        actionBar.style.gap = "10px";
+
+        const styleActionButton = (button: HTMLButtonElement) => {
+          button.style.border = "1px solid #0d7ec0";
+          button.style.borderRadius = "10px";
+          button.style.background = "#ffffff";
+          button.style.color = "#0d5f93";
+          button.style.fontFamily = "'Plus Jakarta Sans', 'Segoe UI', sans-serif";
+          button.style.fontWeight = "700";
+          button.style.fontSize = "14px";
+          button.style.padding = "9px 13px";
+          button.style.cursor = "pointer";
+          button.style.boxShadow = "0 6px 18px rgba(9, 27, 43, 0.22)";
+        };
+
+        const saveButton = documentRef.createElement("button");
+        saveButton.type = "button";
+        saveButton.textContent = "Save";
+        styleActionButton(saveButton);
+        saveButton.onclick = () => {
+          const link = documentRef.createElement("a");
+          link.href = dataUrl;
+          link.download = `family-tree-${new Date().toISOString().slice(0, 10)}.png`;
+          link.click();
+        };
+
+        const returnButton = documentRef.createElement("button");
+        returnButton.type = "button";
+        returnButton.textContent = "Return";
+        styleActionButton(returnButton);
+        returnButton.onclick = () => {
+          if (imageWindow.opener && !imageWindow.opener.closed) {
+            imageWindow.opener.focus();
+          }
+          imageWindow.close();
+        };
+
+        viewer.appendChild(preview);
+        actionBar.appendChild(returnButton);
+        actionBar.appendChild(saveButton);
+        documentRef.body.appendChild(viewer);
+        documentRef.body.appendChild(actionBar);
+      }
+    } catch (error) {
+      console.error("Unable to export family tree image", error);
+
+      const message = error instanceof Error ? error.message : "Unexpected rendering error.";
+      const errorDoc = imageWindow.document;
+      errorDoc.title = "Family Tree Image - Error";
+      errorDoc.body.innerHTML = "";
+      errorDoc.body.style.margin = "0";
+      errorDoc.body.style.display = "grid";
+      errorDoc.body.style.placeItems = "center";
+      errorDoc.body.style.minHeight = "100vh";
+      errorDoc.body.style.background = "#ffffff";
+      errorDoc.body.style.fontFamily = "'Plus Jakarta Sans', 'Segoe UI', sans-serif";
+      errorDoc.body.style.color = "#8a1028";
+
+      const errorBox = errorDoc.createElement("div");
+      errorBox.style.maxWidth = "620px";
+      errorBox.style.padding = "18px 20px";
+      errorBox.style.border = "1px solid #f0b7c1";
+      errorBox.style.borderRadius = "12px";
+      errorBox.style.background = "#fff7f9";
+      errorBox.style.boxShadow = "0 8px 20px rgba(120, 18, 38, 0.08)";
+      errorBox.innerHTML = `<strong>Image render failed.</strong><div style="margin-top:8px; color:#7b2236;">${message}</div>`;
+
+      errorDoc.body.appendChild(errorBox);
+    } finally {
+      setCollapsedIds(previousCollapsedIds);
+      setIsExpandAllMode(previousExpandAllMode);
+      setShowTopGenerationOnly(previousTopGenerationOnly);
+      setIsExportingImage(false);
+    }
+  }, [collapsedIds, isExpandAllMode, showTopGenerationOnly, isExportingImage, isLeftToRightLayout]);
+
   const handleNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
       navigate(`/person/${node.id}`);
@@ -860,6 +1507,14 @@ function FamilyTree() {
             </button>
             <button type="button" className="tree-action-btn" onClick={handleCollapseAll}>
               Collapse all
+            </button>
+            <button
+              type="button"
+              className="tree-action-btn"
+              onClick={() => void handleExportImage()}
+              disabled={isExportingImage}
+            >
+              {isExportingImage ? "Rendering..." : "Image"}
             </button>
             <button type="button" className="tree-action-btn" onClick={handleToggleLayout}>
               Layout: {isLeftToRightLayout ? "Left/Right" : "Top/Down"}
