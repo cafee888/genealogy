@@ -98,6 +98,7 @@ function PersonPage() {
   const photos = getPhotosForPerson(person.id);
   const isDeceased = person.deceased;
   const ageAtDeath = calculateAgeAtDeath(person);
+  const deceasedYear = extractYear(person.death.date, person.death.year);
 
   const renderRelativeLinks = (items: Person[]) => {
     if (items.length === 0) {
@@ -162,6 +163,11 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Bio</h3>
+        {isDeceased && (
+          <p>
+            <strong>Deceased year:</strong> {deceasedYear ?? "Unknown"}
+          </p>
+        )}
         <p className="multiline-text">{isDeceased ? person.bio : normalizeBioToPresentTense(person.bio)}</p>
       </section>
 
