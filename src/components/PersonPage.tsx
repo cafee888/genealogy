@@ -148,6 +148,11 @@ function PersonPage() {
         <p>
           <strong>Status:</strong> {isDeceased ? "Deceased" : "Living"}
         </p>
+        {isDeceased && (
+          <p>
+            <strong>Deceased year:</strong> {deceasedYear ?? "Unknown"}
+          </p>
+        )}
         {isDeceased && ageAtDeath !== null && (
           <p>
             <strong>Age at death:</strong> {ageAtDeath}
@@ -163,11 +168,6 @@ function PersonPage() {
 
       <section className="profile-section">
         <h3>Bio</h3>
-        {isDeceased && (
-          <p>
-            <strong>Deceased year:</strong> {deceasedYear ?? "Unknown"}
-          </p>
-        )}
         <p className="multiline-text">{isDeceased ? person.bio : normalizeBioToPresentTense(person.bio)}</p>
       </section>
 
