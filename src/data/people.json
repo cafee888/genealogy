@@ -675,10 +675,12 @@
     "name": "Shea Kong Nam",
     "chineseName": "佘光南",
     "birth": {
-      "place": "Malaya"
+      "place": "Malaya",
+      "year": 1920
     },
     "death": {
-      "place": "Malaysia"
+      "place": "Malaysia",
+      "year": 1998
     },
     "parents": [
       "shea-woon-mun",
@@ -689,6 +691,39 @@
     ],
     "bio": "Kong Nam was the son of Woon Mun and Yoke Keng. He was born in Malaya.",
     "gender": "male",
+    "spouses": [
+      "ng-sim-choo"
+    ],
+    "deceased": true,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id":"ng-sim-choo",
+    "name": "Ng Sim Choo",
+    "chineseName": "黄心珠",
+    "birth": {
+      "place": "Malaysia",
+      "year": 1922
+    },
+    "death": {
+      "place": "Malaysia",
+      "year": 1988
+    },
+    "parents": [],
+    "spouses": [
+      "shea-kong-nam"
+    ],
+    "children": [
+      "shea-chee-wang"
+    ],
+    "bio": "Sim Choo was the spouse of Kong Nam.",
+    "gender": "female",
     "deceased": true,
     "locations": [
       {
@@ -704,7 +739,8 @@
     "aliasName": "Chee Wang",
     "chineseName": "佘志宏",
     "birth": {
-      "place": "Malaysia"
+      "place": "Malaysia",
+      "year": 1949
     },
     "parents": [
       "shea-kong-nam"
@@ -713,8 +749,37 @@
       "shea-wai-yee",
       "shea-wai-hoh"
     ],
+    "spouses": [
+      "christina-cho-yoke-yong"
+    ],
     "bio": "Chee Wang was the son of Kong Nam.",
     "gender": "male",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Malaysia"
+      }
+    ]
+  },
+  {
+    "id": "christina-cho-yoke-yong",
+    "name": "Christina Cho Yee Yong",
+    "birth": {
+      "place": "Malaysia",
+      "year": 1950
+    },
+    "parents": [],    
+    "spouses": [
+      "shea-chee-wang"
+    ],    
+    "children": [
+      "shea-wai-yee",
+      "shea-wai-hoh"
+    ],  
+    "bio": "Christina Cho is the spouse of Chee Wang.",
+    "gender": "female",
     "deceased": false,
     "locations": [
       {
@@ -729,19 +794,20 @@
     "name": "Michelle Shea Wai Yee",
     "chineseName": "佘慧仪",
     "birth": {
-      "place": "Malaysia"
+      "place": "Malaysia",
+      "year": 1977
     },
     "parents": [
       "shea-chee-wang"
     ],
-    "bio": "Michelle Wai Yee is the daughter of Chee Wang.",
+    "bio": "Michelle Wai Yee is the daughter of Chee Wang. Michelle is currently living in Mont Kiara, Malaysia. \n With her husband Jason Tan (1974), they have 2 daughters, \n Allyssa Tan Yee Wen (2010) and CarissaTan Yee Ching (2010). \n They are studying in Wesley Methodist Int'l School, Kuala Lumpur.", 
     "gender": "female",
     "deceased": false,
     "locations": [
       {
         "type": "residence",
         "year": null,
-        "place": "Malaysia"
+        "place": "Mont Kiara, Malaysia"
       }
     ]
   },
@@ -750,13 +816,17 @@
     "name": "Maximilian Shea Wai Hoh",
     "chineseName": "佘伟浩",
     "birth": {
-      "place": "Malaysia"
+      "place": "Malaysia",
+      "year": 1983
     },
     "parents": [
       "shea-chee-wang"
     ],
     "children": [
       "jaden-max-shea"
+    ],
+    "spouses": [
+      "june-lam-sook-ching"
     ],
     "bio": "Wai Hoh is the son of Chee Wang.",
     "gender": "male",
@@ -771,10 +841,11 @@
   },
   {
     "id": "jaden-max-shea",
-    "name": "Jaden Max Shea",
+    "name": "Jaden Max Shea Jun Wei",
     "chineseName": "佘俊希",
     "birth": {
-      "place": "Malaysia"
+      "place": "Singapore",
+      "year": 2015
     },
     "parents": [
       "shea-wai-hoh"
@@ -786,9 +857,33 @@
       {
         "type": "residence",
         "year": null,
-        "place": "Malaysia"
+        "place": "Singapore"
       }
     ]
+  },
+  {    
+    "id": "june-lam-sook-ching",
+    "name": "June Lam Sook Ching",
+    "birth": {
+      "year": 1983
+    },
+    "parents": [],
+    "spouses": [
+      "shea-wai-hoh"
+    ],
+    "children": [
+      "jaden-max-shea"
+    ],
+    "bio": "June Lam is the spouse of Wai Hoh.",
+    "gender": "female",
+    "deceased": false,
+    "locations": [
+      {
+        "type": "residence",
+        "year": null,
+        "place": "Singapore"
+      }
+    ]   
   },
   {
     "id": "shea-yoke-lan",
